@@ -105,7 +105,7 @@ namespace broma {
 	struct run_action<rule_begin<link_attribute>> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
-			scratch->wip_attributes.links = Platform::None;
+			scratch->wip_attributes.links = Platform::NONE;
 		}
 	};
 
@@ -123,7 +123,7 @@ namespace broma {
 	struct run_action<rule_begin<missing_attribute>> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
-			scratch->wip_attributes.missing = Platform::None;
+			scratch->wip_attributes.missing = Platform::NONE;
 		}
 	};
 	template <>
