@@ -10,7 +10,7 @@
 namespace broma {
 	/// @brief The platform currently being processed in a bind statement.
 	enum class Platform {
-		None = 0,
+		NONE = 0,
 		Mac = 1,
 		Windows = 2,
 		Android = 4,
