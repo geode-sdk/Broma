@@ -36,4 +36,26 @@ namespace broma {
 
 		return root;
 	}
+
+	SafeRootResult parse_file_safely(std::string const& fname){
+		file_input<> input(fname);
+		
+		SafeRootResult srr;
+		
+		srr.has_errors = false;
+
+		ScratchData scratch;
+		parse<must<root_grammar>, run_action>(input, &srr.root, &scratch);
+		post_process(srr.root);
+		
+
+		if (scratch.errors.size()){
+			srr.has_errors = true;
+			
+			for (auto& e : scratch.errors) {
+				srr.erros.emplace_back(e.what());
+			}
+		}
+		return srr;
+	}
 } // namespace broma
