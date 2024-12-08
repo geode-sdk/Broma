@@ -218,4 +218,20 @@ namespace broma {
 			return &*it;
 		}
 	};
+
+	/// @brief Used as a safety mechanism for parsing 
+	// broma files in other languages such as Rust and 
+	// Python or upon use with servers or when in use 
+	// with discord bots so that the code doesn't need 
+	// to exit upon having an error thrown.
+	typedef struct SafeRootResult {
+		/// @brief Root result if code has been parsed successfully.
+		Root root;
+		/// @brief A list of errors grabbed if any exist.
+		std::vector<char*>erros;
+		/// @brief a fag for check if parsing threw an error to begin with.
+		bool has_errors;
+	} SafeRootResult;
+
+
 } // namespace broma
