@@ -40,22 +40,24 @@ namespace broma {
 	SafeRootResult parse_file_safely(std::string const& fname){
 		file_input<> input(fname);
 		
-		SafeRootResult srr;
-		
-		srr.has_errors = false;
+		SafeRootResult result;
 
+		Root root;
 		ScratchData scratch;
-		parse<must<root_grammar>, run_action>(input, &srr.root, &scratch);
-		post_process(srr.root);
-		
+		parse<must<root_grammar>, run_action>(input, &root, &scratch);
+		post_process(root);
 
-		if (scratch.errors.size()){
-			srr.has_errors = true;
-			
-			for (auto& e : scratch.errors) {
-				srr.erros.emplace_back(e.what());
+		if (scratch.errors.size()) {
+			std::vector<char*>err_data;
+			for (auto&e : scratch.errors){
+				err_data.emplace_back(e.what());
 			}
+			result.result = reinterpret_cast<void*>(&err_data);
+			result.is_error = true;
+		} else {
+			result.result = reinterpret_cast<void*>(&root);
+			result.is_error = false;
 		}
-		return srr;
+		return result;
 	}
 } // namespace broma
