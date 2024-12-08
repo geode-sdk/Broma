@@ -220,7 +220,7 @@ namespace broma {
 	};
 
 	/// @brief Used as a safety mechanism for parsing 
-	// in other languages or on multiple threads. 
+	// in other languages or on multiple threads.
 	typedef struct SafeRootResult {
 		void* result;
 		bool is_error;
