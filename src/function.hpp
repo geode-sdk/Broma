@@ -99,6 +99,7 @@ namespace broma {
 			scratch->wip_attributes = Attributes();
 			scratch->wip_attributes.links = scratch->wip_class.attributes.links;
 			scratch->wip_attributes.missing = scratch->wip_class.attributes.missing;
+			scratch->wip_attributes.nodefine = scratch->wip_class.attributes.nodefine;
 
 			scratch->wip_mem_fn_proto = MemberFunctionProto();
 		}
