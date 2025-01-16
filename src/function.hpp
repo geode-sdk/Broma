@@ -58,6 +58,7 @@ namespace broma {
 
 			Function f;
 			f.prototype = scratch->wip_fn_proto;
+			f.binds = scratch->wip_bind;
 			root->functions.push_back(f);
 
 			scratch->wip_attributes = Attributes();
