@@ -53,6 +53,13 @@ namespace broma {
 		>
 	>> {};
 
+	struct nodefine_attribute : basic_attribute<TAO_PEGTL_KEYWORD("nodefine"), tagged_rule<nodefine_attribute,
+		seq<
+			rule_begin<nodefine_attribute>,
+			opt<platform_list<nodefine_attribute>>
+		>
+	>> {};
+
 	/// @brief All allowed C++ attributes.
 	///
 	/// Currently, this includes the `docs(...)`, `depends(...)`, `link(...)` and `missing(...)` attributes.
@@ -64,7 +71,7 @@ namespace broma {
 				success,
 				list<seq<
 					sep,
-					sor<depends_attribute, link_attribute, missing_attribute>,
+					sor<depends_attribute, link_attribute, missing_attribute, nodefine_attribute>,
 					sep
 				>, one<','>>
 			>,
@@ -131,6 +138,24 @@ namespace broma {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			scratch->wip_attributes.missing |= str_to_platform(input.string());
+		}
+	};
+
+	// nodefine
+
+	template <>
+	struct run_action<rule_begin<nodefine_attribute>> {
+		template <typename T>
+		static void apply(T& input, Root* root, ScratchData* scratch) {
+			scratch->wip_attributes.nodefine = Platform::None;
+		}
+	};
+
+	template <>
+	struct run_action<tagged_platform<nodefine_attribute>> {
+		template <typename T>
+		static void apply(T& input, Root* root, ScratchData* scratch) {
+			scratch->wip_attributes.nodefine |= str_to_platform(input.string());
 		}
 	};
 
