@@ -217,15 +217,15 @@ namespace broma {
 		bool is_compatible(Version const& v) const {
 			switch (comparison) {
 				case VersionComparison::Exact:
-					return *this == v;
+					return v == *this;
 				case VersionComparison::MoreEqual:
-					return *this >= v;
+					return v >= *this;
 				case VersionComparison::LessEqual:
-					return *this <= v;
+					return v <= *this;
 				case VersionComparison::More:
-					return *this > v;
+					return v > *this;
 				case VersionComparison::Less:
-					return *this < v;
+					return v < *this;
 			}
 			return false;
 		}
