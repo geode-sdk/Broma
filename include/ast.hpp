@@ -6,6 +6,7 @@
 #include <map>
 #include <algorithm>
 #include <iostream>
+#include <optional>
 
 namespace broma {
 	/// @brief The platform currently being processed in a bind statement.
