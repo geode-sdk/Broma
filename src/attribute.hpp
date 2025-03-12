@@ -68,7 +68,7 @@ namespace broma {
 		one<'.'>,
 		plus<ascii::digit>,
 		opt<one<'-'>, sor<TAO_PEGTL_KEYWORD("alpha"), TAO_PEGTL_KEYWORD("beta"), TAO_PEGTL_KEYWORD("prerelease")>>,
-		opt<one<'.'>, ascii::digit>
+		opt<one<'.'>, plus<ascii::digit>>
 	> {};
 
 	struct since_attribute : basic_attribute<TAO_PEGTL_KEYWORD("since"), tagged_rule<since_attribute, version_comparison>> {};

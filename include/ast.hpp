@@ -6,7 +6,7 @@
 #include <map>
 #include <algorithm>
 #include <iostream>
-#include <optional>
+#include <tuple>
 
 namespace broma {
 	/// @brief The platform currently being processed in a bind statement.
@@ -89,130 +89,33 @@ namespace broma {
 		Release,
 	};
 
-	/// @brief A version tag.
-	struct VersionTag {
-		VersionType type = VersionType::Release;
-		std::optional<int> number;
-		
-		bool operator==(VersionTag const& t) const {
-			return type == t.type && number == t.number;
-		}
-
-		bool operator<(VersionTag const& t) const {
-			if (type < t.type)
-				return true;
-			if (type > t.type)
-				return false;
-
-			if (!number.has_value() && t.number.has_value())
-				return true;
-			if (number.has_value() && !t.number.has_value())
-				return false;
-
-			if (number.has_value() && t.number.has_value())
-				return number.value() < t.number.value();
-
-			return false;
-		}
-
-		bool operator>(VersionTag const& t) const {
-			if (type > t.type)
-				return true;
-			if (type < t.type)
-				return false;
-
-			if (!number.has_value() && t.number.has_value())
-				return false;
-			if (number.has_value() && !t.number.has_value())
-				return true;
-
-			if (number.has_value() && t.number.has_value())
-				return number.value() > t.number.value();
-
-			return false;
-		}
-
-		bool operator<=(VersionTag const& t) const {
-			return *this < t || *this == t;
-		}
-
-		bool operator>=(VersionTag const& t) const {
-			return *this > t || *this == t;
-		}
-	};
-
-	/// @brief Represents a semver version.
+	/// @brief A semantic version with comparison.
 	struct Version {
 		VersionComparison comparison = VersionComparison::MoreEqual;
 		int major = 0;
 		int minor = 0;
 		int patch = 0;
-		std::optional<VersionTag> tag;
+		VersionType type = VersionType::Release;
+		int tag = 0;
 
 		bool operator==(Version const& v) const {
-			return major == v.major && minor == v.minor && patch == v.patch && tag == v.tag;
+			return std::tie(major, minor, patch, type, tag) == std::tie(v.major, v.minor, v.patch, v.type, v.tag);
 		}
 
 		bool operator<(Version const& v) const {
-			if (major < v.major)
-				return true;
-			if (major > v.major)
-				return false;
-
-			if (minor < v.minor)
-				return true;
-			if (minor > v.minor)
-				return false;
-
-			if (patch < v.patch)
-				return true;
-			if (patch > v.patch)
-				return false;
-
-			if (!tag.has_value() && v.tag.has_value())
-				return false;
-			if (tag.has_value() && !v.tag.has_value())
-				return true;
-
-			if (tag.has_value() && v.tag.has_value())
-				return tag.value() < v.tag.value();
-
-			return false;
+			return std::tie(major, minor, patch, type, tag) < std::tie(v.major, v.minor, v.patch, v.type, v.tag);
 		}
 
 		bool operator>(Version const& v) const {
-			if (major > v.major)
-				return true;
-			if (major < v.major)
-				return false;
-
-			if (minor > v.minor)
-				return true;
-			if (minor < v.minor)
-				return false;
-
-			if (patch > v.patch)
-				return true;
-			if (patch < v.patch)
-				return false;
-
-			if (!tag.has_value() && v.tag.has_value())
-				return true;
-			if (tag.has_value() && !v.tag.has_value())
-				return false;
-
-			if (tag.has_value() && v.tag.has_value())
-				return tag.value() > v.tag.value();
-
-			return false;
+			return std::tie(major, minor, patch, type, tag) > std::tie(v.major, v.minor, v.patch, v.type, v.tag);
 		}
 
 		bool operator<=(Version const& v) const {
-			return *this < v || *this == v;
+			return std::tie(major, minor, patch, type, tag) <= std::tie(v.major, v.minor, v.patch, v.type, v.tag);
 		}
 
 		bool operator>=(Version const& v) const {
-			return *this > v || *this == v;
+			return std::tie(major, minor, patch, type, tag) >= std::tie(v.major, v.minor, v.patch, v.type, v.tag);
 		}
 
 		bool is_compatible(Version const& v) const {
@@ -234,7 +137,6 @@ namespace broma {
 
 	inline Version str_to_version(std::string const& str) {
 		Version v;
-		VersionTag tag;
 		std::vector<std::string> parts = {};
 
 		for (char c : str) {
@@ -278,20 +180,19 @@ namespace broma {
 		}
 		if (parts.size() > 3) {
 			if (parts[3].starts_with("alpha")) {
-				tag.type = VersionType::Alpha;
+				v.type = VersionType::Alpha;
 			} else if (parts[3].starts_with("beta")) {
-				tag.type = VersionType::Beta;
+				v.type = VersionType::Beta;
 			} else if (parts[3].starts_with("prerelease")) {
-				tag.type = VersionType::Prerelease;
+				v.type = VersionType::Prerelease;
 			} else {
-				tag.type = VersionType::Release;
+				v.type = VersionType::Release;
 			}
 		}
 		if (parts.size() > 4) {
-			tag.number = std::stoi(parts[4]);
+			v.tag = std::stoi(parts[4]);
 		}
 
-		v.tag = tag;
 		return v;
 	}
 

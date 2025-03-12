@@ -38,23 +38,21 @@ void print_func(broma::FunctionProto& func, broma::PlatformNumber& addrs, std::s
             break;
     }
     std::cout << func.attributes.since.major << "." << func.attributes.since.minor << "." << func.attributes.since.patch;
-    if (auto tag = func.attributes.since.tag) {
-        switch (tag.value().type) {
-            case broma::VersionType::Alpha:
-                std::cout << "-alpha";
-                break;
-            case broma::VersionType::Beta:
-                std::cout << "-beta";
-                break;
-            case broma::VersionType::Prerelease:
-                std::cout << "-prerelease";
-                break;
-            default:
-                break;
-        }
-        if (tag.value().number.has_value()) {
-            std::cout << "." << tag.value().number.value();
-        }
+    switch (func.attributes.since.type) {
+        case broma::VersionType::Alpha:
+            std::cout << "-alpha";
+            break;
+        case broma::VersionType::Beta:
+            std::cout << "-beta";
+            break;
+        case broma::VersionType::Prerelease:
+            std::cout << "-prerelease";
+            break;
+        default:
+            break;
+    }
+    if (func.attributes.since.tag > 0) {
+        std::cout << "." << func.attributes.since.tag;
     }
     std::cout << "\n";
     std::cout << "\t" << func.ret.name << " " << func.name << "(";
