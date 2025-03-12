@@ -169,9 +169,9 @@ namespace broma {
 				return false;
 
 			if (!tag.has_value() && v.tag.has_value())
-				return true;
-			if (tag.has_value() && !v.tag.has_value())
 				return false;
+			if (tag.has_value() && !v.tag.has_value())
+				return true;
 
 			if (tag.has_value() && v.tag.has_value())
 				return tag.value() < v.tag.value();
@@ -196,9 +196,9 @@ namespace broma {
 				return false;
 
 			if (!tag.has_value() && v.tag.has_value())
-				return false;
-			if (tag.has_value() && !v.tag.has_value())
 				return true;
+			if (tag.has_value() && !v.tag.has_value())
+				return false;
 
 			if (tag.has_value() && v.tag.has_value())
 				return tag.value() > v.tag.value();
