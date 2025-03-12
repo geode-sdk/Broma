@@ -185,8 +185,6 @@ namespace broma {
 				v.type = VersionType::Beta;
 			} else if (parts[3].starts_with("prerelease")) {
 				v.type = VersionType::Prerelease;
-			} else {
-				v.type = VersionType::Release;
 			}
 		}
 		if (parts.size() > 4) {
