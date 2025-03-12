@@ -53,6 +53,25 @@ namespace broma {
 		>
 	>> {};
 
+	struct version_comparison : seq<
+		opt<sor<
+			ascii::string<'=', '='>,
+			ascii::string<'<', '='>,
+			ascii::string<'>', '='>,
+			one<'<'>,
+			one<'>'>
+		>>,
+		plus<ascii::digit>,
+		one<'.'>,
+		plus<ascii::digit>,
+		one<'.'>,
+		plus<ascii::digit>,
+		opt<one<'-'>, sor<TAO_PEGTL_KEYWORD("alpha"), TAO_PEGTL_KEYWORD("beta"), TAO_PEGTL_KEYWORD("prerelease")>>,
+		opt<one<'.'>, ascii::digit>
+	> {};
+
+	struct since_attribute : basic_attribute<TAO_PEGTL_KEYWORD("since"), tagged_rule<since_attribute, version_comparison>> {};
+
 	/// @brief All allowed C++ attributes.
 	///
 	/// Currently, this includes the `docs(...)`, `depends(...)`, `link(...)` and `missing(...)` attributes.
@@ -64,7 +83,7 @@ namespace broma {
 				success,
 				list<seq<
 					sep,
-					sor<depends_attribute, link_attribute, missing_attribute>,
+					sor<depends_attribute, link_attribute, missing_attribute, since_attribute>,
 					sep
 				>, one<','>>
 			>,
@@ -131,6 +150,16 @@ namespace broma {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			scratch->wip_attributes.missing |= str_to_platform(input.string());
+		}
+	};
+
+	// since
+
+	template <>
+	struct run_action<tagged_rule<since_attribute, version_comparison>> {
+		template <typename T>
+		static void apply(T& input, Root* root, ScratchData* scratch) {
+			scratch->wip_attributes.since = str_to_version(input.string());
 		}
 	};
 

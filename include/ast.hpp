@@ -71,12 +71,233 @@ namespace broma {
 		}
 	};
 
+	/// @brief A version comparison type.
+	enum class VersionComparison {
+		Exact,
+		MoreEqual,
+		LessEqual,
+		More,
+		Less,
+	};
+
+	/// @brief A version pre-release type.
+	enum class VersionType {
+		Alpha,
+		Beta,
+		Prerelease,
+		Release,
+	};
+
+	/// @brief A version tag.
+	struct VersionTag {
+		VersionType type = VersionType::Release;
+		std::optional<int> number;
+		
+		bool operator==(VersionTag const& t) const {
+			return type == t.type && number == t.number;
+		}
+
+		bool operator<(VersionTag const& t) const {
+			if (type < t.type)
+				return true;
+			if (type > t.type)
+				return false;
+
+			if (!number.has_value() && t.number.has_value())
+				return true;
+			if (number.has_value() && !t.number.has_value())
+				return false;
+
+			if (number.has_value() && t.number.has_value())
+				return number.value() < t.number.value();
+
+			return false;
+		}
+
+		bool operator>(VersionTag const& t) const {
+			if (type > t.type)
+				return true;
+			if (type < t.type)
+				return false;
+
+			if (!number.has_value() && t.number.has_value())
+				return false;
+			if (number.has_value() && !t.number.has_value())
+				return true;
+
+			if (number.has_value() && t.number.has_value())
+				return number.value() > t.number.value();
+
+			return false;
+		}
+
+		bool operator<=(VersionTag const& t) const {
+			return *this < t || *this == t;
+		}
+
+		bool operator>=(VersionTag const& t) const {
+			return *this > t || *this == t;
+		}
+	};
+
+	/// @brief Represents a semver version.
+	struct Version {
+		VersionComparison comparison = VersionComparison::MoreEqual;
+		int major = 0;
+		int minor = 0;
+		int patch = 0;
+		std::optional<VersionTag> tag;
+
+		bool operator==(Version const& v) const {
+			return major == v.major && minor == v.minor && patch == v.patch && tag == v.tag;
+		}
+
+		bool operator<(Version const& v) const {
+			if (major < v.major)
+				return true;
+			if (major > v.major)
+				return false;
+
+			if (minor < v.minor)
+				return true;
+			if (minor > v.minor)
+				return false;
+
+			if (patch < v.patch)
+				return true;
+			if (patch > v.patch)
+				return false;
+
+			if (!tag.has_value() && v.tag.has_value())
+				return true;
+			if (tag.has_value() && !v.tag.has_value())
+				return false;
+
+			if (tag.has_value() && v.tag.has_value())
+				return tag.value() < v.tag.value();
+
+			return false;
+		}
+
+		bool operator>(Version const& v) const {
+			if (major > v.major)
+				return true;
+			if (major < v.major)
+				return false;
+
+			if (minor > v.minor)
+				return true;
+			if (minor < v.minor)
+				return false;
+
+			if (patch > v.patch)
+				return true;
+			if (patch < v.patch)
+				return false;
+
+			if (!tag.has_value() && v.tag.has_value())
+				return false;
+			if (tag.has_value() && !v.tag.has_value())
+				return true;
+
+			if (tag.has_value() && v.tag.has_value())
+				return tag.value() > v.tag.value();
+
+			return false;
+		}
+
+		bool operator<=(Version const& v) const {
+			return *this < v || *this == v;
+		}
+
+		bool operator>=(Version const& v) const {
+			return *this > v || *this == v;
+		}
+
+		bool is_compatible(Version const& v) const {
+			switch (comparison) {
+				case VersionComparison::Exact:
+					return *this == v;
+				case VersionComparison::MoreEqual:
+					return *this >= v;
+				case VersionComparison::LessEqual:
+					return *this <= v;
+				case VersionComparison::More:
+					return *this > v;
+				case VersionComparison::Less:
+					return *this < v;
+			}
+			return false;
+		}
+	};
+
+	inline Version str_to_version(std::string const& str) {
+		Version v;
+		VersionTag tag;
+		std::vector<std::string> parts = {};
+
+		for (char c : str) {
+			if (c == '.' || c == '-') {
+				parts.push_back("");
+			} else {
+				if (parts.empty())
+					parts.push_back("");
+				parts.back() += c;
+			}
+		}
+
+		if (parts.size() > 0) {
+			if (parts[0].starts_with(">=")) {
+				v.comparison = VersionComparison::MoreEqual;
+				parts[0].erase(0, 2);
+			} else if (parts[0].starts_with("<=")) {
+				v.comparison = VersionComparison::LessEqual;
+				parts[0].erase(0, 2);
+			} else if (parts[0].starts_with(">")) {
+				v.comparison = VersionComparison::More;
+				parts[0].erase(0, 1);
+			} else if (parts[0].starts_with("<")) {
+				v.comparison = VersionComparison::Less;
+				parts[0].erase(0, 1);
+			} else if (parts[0].starts_with("=")) {
+				v.comparison = VersionComparison::Exact;
+				parts[0].erase(0, 1);
+			}
+
+			v.major = std::stoi(parts[0]);
+		}
+		if (parts.size() > 1) {
+			v.minor = std::stoi(parts[1]);
+		}
+		if (parts.size() > 2) {
+			v.patch = std::stoi(parts[2]);
+		}
+		if (parts.size() > 3) {
+			if (parts[3].starts_with("alpha")) {
+				tag.type = VersionType::Alpha;
+			} else if (parts[3].starts_with("beta")) {
+				tag.type = VersionType::Beta;
+			} else if (parts[3].starts_with("prerelease")) {
+				tag.type = VersionType::Prerelease;
+			} else {
+				tag.type = VersionType::Release;
+			}
+		}
+		if (parts.size() > 4) {
+			tag.number = std::stoi(parts[4]);
+		}
+
+		v.tag = tag;
+		return v;
+	}
+
 	/// @brief List of attributes that could be applied to a class or a function
 	struct Attributes {
 		std::string docs; ///< Any docstring pulled from a `[[docs(...)]]` attribute.
 		Platform links = Platform::None; ///< All the platforms that link the class or function
 		Platform missing = Platform::None; ///< All the platforms that are missing the class or function
 		std::vector<std::string> depends; ///< List of classes that this class or function depends on
+		Version since; ///< The SDK version that this class or function was introduced in
 	};
 
 	struct FunctionProto {
