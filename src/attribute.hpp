@@ -61,6 +61,7 @@ namespace broma {
 			one<'<'>,
 			one<'>'>
 		>>,
+		opt<one<'v'>>,
 		plus<ascii::digit>,
 		one<'.'>,
 		plus<ascii::digit>,

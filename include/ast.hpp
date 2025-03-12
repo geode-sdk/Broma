@@ -265,6 +265,9 @@ namespace broma {
 				parts[0].erase(0, 1);
 			}
 
+			if (parts[0].starts_with("v")) {
+				parts[0].erase(0, 1);
+			}
 			v.major = std::stoi(parts[0]);
 		}
 		if (parts.size() > 1) {
