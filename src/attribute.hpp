@@ -53,25 +53,7 @@ namespace broma {
 		>
 	>> {};
 
-	struct version_comparison : seq<
-		opt<sor<
-			ascii::string<'=', '='>,
-			ascii::string<'<', '='>,
-			ascii::string<'>', '='>,
-			one<'<'>,
-			one<'>'>
-		>>,
-		opt<one<'v'>>,
-		plus<ascii::digit>,
-		one<'.'>,
-		plus<ascii::digit>,
-		one<'.'>,
-		plus<ascii::digit>,
-		opt<one<'-'>, sor<TAO_PEGTL_KEYWORD("alpha"), TAO_PEGTL_KEYWORD("beta"), TAO_PEGTL_KEYWORD("prerelease")>>,
-		opt<one<'.'>, plus<ascii::digit>>
-	> {};
-
-	struct since_attribute : basic_attribute<TAO_PEGTL_KEYWORD("since"), tagged_rule<since_attribute, version_comparison>> {};
+	struct since_attribute : basic_attribute<TAO_PEGTL_KEYWORD("since"), tagged_rule<since_attribute, string_literal>> {};
 
 	/// @brief All allowed C++ attributes.
 	///
@@ -157,10 +139,10 @@ namespace broma {
 	// since
 
 	template <>
-	struct run_action<tagged_rule<since_attribute, version_comparison>> {
+	struct run_action<tagged_rule<since_attribute, string_literal>> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
-			scratch->wip_attributes.since = str_to_version(input.string());
+			scratch->wip_attributes.since = input.string().substr(1, input.string().size() - 2);
 		}
 	};
 

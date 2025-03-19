@@ -19,42 +19,7 @@ void print_special_constant(std::ptrdiff_t num) {
 void print_func(broma::FunctionProto& func, broma::PlatformNumber& addrs, std::string inner = "") {
 
     std::cout << "\tmissing: " << (long)func.attributes.missing << "\n";
-    std::cout << "\tsince: ";
-    switch (func.attributes.since.comparison) {
-        case broma::VersionComparison::Exact:
-            std::cout << "=";
-            break;
-        case broma::VersionComparison::MoreEqual:
-            std::cout << ">=";
-            break;
-        case broma::VersionComparison::LessEqual:
-            std::cout << "<=";
-            break;
-        case broma::VersionComparison::More:
-            std::cout << ">";
-            break;
-        case broma::VersionComparison::Less:
-            std::cout << "<";
-            break;
-    }
-    std::cout << func.attributes.since.major << "." << func.attributes.since.minor << "." << func.attributes.since.patch;
-    switch (func.attributes.since.type) {
-        case broma::VersionType::Alpha:
-            std::cout << "-alpha";
-            break;
-        case broma::VersionType::Beta:
-            std::cout << "-beta";
-            break;
-        case broma::VersionType::Prerelease:
-            std::cout << "-prerelease";
-            break;
-        default:
-            break;
-    }
-    if (func.attributes.since.tag > 0) {
-        std::cout << "." << func.attributes.since.tag;
-    }
-    std::cout << "\n";
+    std::cout << "\tsince: " << func.attributes.since << "\n";
     std::cout << "\t" << func.ret.name << " " << func.name << "(";
     for (auto arg : func.args) {
         std::cout << arg.first.name << " " << arg.second << ", ";
