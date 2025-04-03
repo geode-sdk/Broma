@@ -21,7 +21,7 @@ namespace broma {
 
 				opt<rpad_space<keyword_const>>,
 				star<seq<sep, one<'&', '*'>>>,
-				opt<pad_space<keyword_const>>
+				opt<rpad_space<keyword_const>>
 			>
 		> {};
 
