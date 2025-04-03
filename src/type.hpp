@@ -20,7 +20,8 @@ namespace broma {
 				if_then_else<pad_space<keyword_unsigned>, opt<qualified>, qualified>,
 
 				opt<rpad_space<keyword_const>>,
-				star<seq<sep, one<'&', '*'>>>
+				star<seq<sep, one<'&', '*'>>>,
+				opt<pad_space<keyword_const>>
 			>
 		> {};
 
