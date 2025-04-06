@@ -98,7 +98,7 @@ namespace broma {
 	/// @brief A C++ qualified identifier.
 	///
 	/// See https://en.cppreference.com/w/cpp/language/identifiers#Qualified_identifiers.
-	struct qualified : list<seq<identifier, opt<template_start>>, ascii::string<':', ':'>>  {};
+	struct qualified : list<seq<seq<opt<pad_space<identifier>>, identifier>, opt<template_start>>, ascii::string<':', ':'>>  {};
 
 	// point of no return: '0x'
 	/// @brief A hex literal.
