@@ -210,12 +210,19 @@ namespace broma {
 		std::string inner; ///< The (optional) inline body of the function as a raw string.
 	};
 
+	/// @brief A header file to be included.
+	struct Header {
+		std::string name;
+		Platform platform = Platform::None;
+	};
+
 	/// @brief Broma's root grammar (the root AST).
 	///
 	/// See the user's guide for an example on how to traverse this AST.
 	struct Root {
 		std::vector<Class> classes;
 		std::vector<Function> functions;
+		std::vector<Header> headers;
 
 		inline Class* operator[](std::string const& name) {
 			auto it = std::find_if(classes.begin(), classes.end(), [name](Class& cls) {
