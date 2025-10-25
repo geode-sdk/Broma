@@ -107,14 +107,6 @@ void print_pad(broma::PlatformNumber& addrs) {
 }
 
 void print_ast(broma::Root& ast) {
-    std::cout << "Headers: " << ast.headers.size() << "\n";
-    for (auto header : ast.headers) {
-        std::cout << "#include ";
-        if (header.platform != broma::Platform::None) {
-            std::cout << nameForPlatform(header.platform) << " ";
-        }
-        std::cout << "<" << header.name << ">\n";
-    }
     std::cout << "Classes: " << ast.classes.size() << "\n";
     for (auto cls : ast.classes) {
         std::cout << "links: " << (long)cls.attributes.links << "\n";

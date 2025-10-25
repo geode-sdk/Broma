@@ -21,7 +21,7 @@ namespace broma {
 	struct run_action<include_platform> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
-			scratch->wip_bind_platform = str_to_platform(input.string());
+			scratch->wip_include_platform = str_to_platform(input.string());
 		}
 	};
 

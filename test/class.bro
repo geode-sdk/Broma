@@ -1,6 +1,3 @@
-#include <string>
-#include mac <vector>
-
 [[link(android)]]
 class Test {
     int member(std::string str);
