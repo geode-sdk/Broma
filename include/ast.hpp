@@ -214,7 +214,7 @@ namespace broma {
 	/// @brief A header file to be included.
 	struct Header {
 		std::string name;
-		Platform platform = Platform::None;
+		Platform platform = Platform::All;
 	};
 
 	/// @brief Broma's root grammar (the root AST).
