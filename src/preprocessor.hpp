@@ -37,6 +37,7 @@ namespace broma {
 					.name = input.string(),
 					.platform = scratch->wip_include_platform
 				});
+				scratch->wip_include_platform = Platform::All;
 				return;
 			}
 

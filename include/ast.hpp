@@ -19,6 +19,7 @@ namespace broma {
 		MacIntel = 32,
 		MacArm = 64,
 		Mac = 64 | 32,  // group for MacIntel and MacArm
+		All = Windows | iOS | Android | Mac,
 	};
 
 	inline Platform str_to_platform(std::string const& str) {

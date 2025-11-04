@@ -28,7 +28,7 @@ namespace broma {
 		std::string wip_fn_body;
 		bool wip_has_explicit_inline;
 		std::optional<Platform> wip_platform_block;
-		Platform wip_include_platform = Platform::None;
+		Platform wip_include_platform = Platform::All;
 
 		std::vector<tao::pegtl::parse_error> errors;
 		const std::filesystem::path include_path;
