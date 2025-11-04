@@ -211,7 +211,7 @@ namespace broma {
 		std::string inner; ///< The (optional) inline body of the function as a raw string.
 	};
 
-	/// @brief A header file to be included.
+	/// @brief A header file to be imported.
 	struct Header {
 		std::string name;
 		Platform platform = Platform::All;

@@ -5,6 +5,7 @@
 #include "basic_components.hpp"
 #include "class.hpp"
 #include "function.hpp"
+#include "import.hpp"
 #include "member.hpp"
 #include "state.hpp"
 #include "post_process.hpp"
@@ -14,7 +15,7 @@ using namespace tao::pegtl;
 
 namespace broma {
 	/// @brief Broma's top-level grammar.
-	struct root_grammar : until<eof, sep, must<sor<include_expr, seq<opt<attribute>, sor<class_statement, function>>>>, sep> {};
+	struct root_grammar : until<eof, sep, must<sor<import_expr, include_expr, seq<opt<attribute>, sor<class_statement, function>>>>, sep> {};
 
 	Root parse_file(std::filesystem::path const& fname) {
 		file_input<> input(fname);
