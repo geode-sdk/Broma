@@ -7,6 +7,9 @@ using namespace tao::pegtl;
 #include "state.hpp"
 
 namespace broma {
+	/// @brief A C++ function body, possibly with an initializer list.
+	struct function_body : if_then_else<one<':'>, seq<sep, until<brace_start>>, brace_start> {};
+
 	/// @brief A bound offset expression.
 	struct bind :
 		seq<rule_begin<bind>, opt_must<
@@ -19,10 +22,10 @@ namespace broma {
 				tagged_rule<bind, sor<hex, keyword_default, keyword_inline>>
 			>, one<','>>,
 			sep
-		>, sor<tagged_rule<bind, brace_start>, one<';'>>> {};
+		>, sor<function_body, one<';'>>> {};
 
 	template <>
-	struct run_action<tagged_rule<bind, brace_start>> {
+	struct run_action<function_body> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			scratch->wip_fn_body = input.string();
