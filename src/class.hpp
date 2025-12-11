@@ -31,7 +31,39 @@ namespace broma {
 		}
 	};
 
-	struct field : sor<inline_expr, pad_expr, member_expr, bind_expr> {};
+	struct comment_expr : sor<
+		seq<at<string<'/', '/'>, not_at<one<'/'>>>, until<eolf>>,
+		seq<string<'/', '*'>, until<seq<string<'*', '/'>>>>
+	> {};
+
+	template <>
+	struct run_action<comment_expr> {
+		template <typename T>
+		static void apply(T& input, Root* root, ScratchData* scratch) {
+			CommentField cf;
+			cf.inner = input.string();
+
+			auto start = input.begin();
+			auto end = input.input().begin();
+			while (start != end && *start != '\n') {
+				--start;
+				if (*start == '\n') {
+					break;
+				}
+				if (*start != ' ' && *start != '\t') {
+					cf.trailing = true;
+					break;
+				}
+			}
+
+			cf.inner.erase(0, cf.inner.find_first_not_of(" \t\n\r"));
+			cf.inner.erase(cf.inner.find_last_not_of(" \t\n\r") + 1);
+
+			scratch->wip_field.inner = std::move(cf);
+		}
+	};
+
+	struct field : sor<inline_expr, pad_expr, member_expr, bind_expr, comment_expr> {};
 
 	template <>
 	struct run_action<field> {
