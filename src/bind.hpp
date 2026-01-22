@@ -15,14 +15,13 @@ namespace broma {
 		seq<rule_begin<bind>, opt_must<
 			one<'='>,
 			sep, 
-			list<sor<
-				opt<
+			list<opt<
+				sor<seq<
 					sep,
 					tagged_platform<bind>,
 					sep,
 					tagged_rule<bind, sor<hex, keyword_default, keyword_inline>
-				>, 
-				tagged_rule<bind, keyword_inline>>
+				>, tagged_rule<bind, keyword_inline> >>
 			>, one<','>>,
 			sep
 		>, sor<function_body, one<';'>>> {};
