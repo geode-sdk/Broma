@@ -20,8 +20,8 @@ namespace broma {
 					sep,
 					tagged_platform<bind>,
 					sep,
-					tagged_rule<bind, sor<hex, keyword_default, keyword_inline>
-				>, tagged_rule<bind, keyword_inline> >>
+					tagged_rule<bind, sor<hex, keyword_default, keyword_inline>>
+				>, tagged_rule<bind, keyword_inline>>
 			>, one<','>>,
 			sep
 		>, sor<function_body, one<';'>>> {};
