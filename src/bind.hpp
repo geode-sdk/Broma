@@ -61,8 +61,8 @@ namespace broma {
 			scratch->wip_has_explicit_inline = true;
 			for (auto& platform : {&scratch->wip_bind.imac, &scratch->wip_bind.m1, &scratch->wip_bind.ios,
 				&scratch->wip_bind.win, &scratch->wip_bind.android32, &scratch->wip_bind.android64}) {
-				if (platform == 0) { // don't replace already specified ones
-					platform = -2;
+				if (*platform == 0) { // don't replace already specified ones
+					*platform = -2;
 				}
 			}
 		}
