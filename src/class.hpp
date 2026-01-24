@@ -41,6 +41,7 @@ namespace broma {
 			scratch->wip_field.parent = scratch->wip_class.name;
 			static size_t index = 0;
 			scratch->wip_field.field_id = index++;
+			scratch->wip_field.line = input.position().line;
 			scratch->wip_class.fields.push_back(scratch->wip_field);
 		}
 	};
@@ -96,6 +97,8 @@ namespace broma {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			scratch->wip_class.name = input.string();
+			scratch->wip_class.filename = input.input().source();
+			scratch->wip_class.line = input.position().line;
 
 			if (std::find(root->classes.begin(), root->classes.end(), input.string()) != root->classes.end()) {
 				scratch->errors.push_back(parse_error("Class duplicate! " + input.string(), input.position()));
