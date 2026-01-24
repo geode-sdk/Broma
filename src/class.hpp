@@ -97,7 +97,7 @@ namespace broma {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			scratch->wip_class.name = input.string();
-			scratch->wip_class.filename = input.input().source();
+			scratch->wip_class.source = input.input().source();
 			scratch->wip_class.line = input.position().line;
 
 			if (std::find(root->classes.begin(), root->classes.end(), input.string()) != root->classes.end()) {

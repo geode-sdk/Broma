@@ -86,7 +86,7 @@ namespace broma {
 			f.binds.win = normalize_platform_number(f.binds.win, has_inline);
 
 			f.inner = scratch->wip_fn_body;
-			f.filename = input.input().source();
+			f.source = input.input().source();
 			f.line = input.position().line;
 
 			// clear state (there's probably a better way to do this too)
