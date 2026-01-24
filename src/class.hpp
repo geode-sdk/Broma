@@ -28,6 +28,7 @@ namespace broma {
 			inf.inner = input.string();
 
 			scratch->wip_field.inner = inf;
+			scratch->wip_field.line = input.position().line;
 		}
 	};
 
@@ -41,7 +42,6 @@ namespace broma {
 			scratch->wip_field.parent = scratch->wip_class.name;
 			static size_t index = 0;
 			scratch->wip_field.field_id = index++;
-			scratch->wip_field.line = input.position().line;
 			scratch->wip_class.fields.push_back(scratch->wip_field);
 		}
 	};

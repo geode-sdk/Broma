@@ -202,6 +202,7 @@ namespace broma {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			scratch->wip_mem_fn_proto.type = FunctionType::Normal;
+			scratch->wip_field.line = input.position().line;
 		}
 	};
 
@@ -210,6 +211,7 @@ namespace broma {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			scratch->wip_mem_fn_proto.type = FunctionType::Ctor;
+			scratch->wip_field.line = input.position().line;
 		}
 	};
 
