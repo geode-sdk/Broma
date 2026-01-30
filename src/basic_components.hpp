@@ -12,7 +12,7 @@ namespace broma {
 		>> {};
 
 	/// @brief Noisy filler grammar elements we want to ignore when parsing.
-	struct ignore : sor<comment, one<'\n', '\t', '\r', ' '>> {};
+	struct ignore : sor<one<'\n', '\t', '\r', ' '>> {};
 
 	/// @brief Separator (zero or more ignoreable elements).
 	struct sep : star<ignore> {};

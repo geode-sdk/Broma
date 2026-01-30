@@ -162,11 +162,17 @@ namespace broma {
 		std::string inner; ///< The inline body of the function as a raw string.
 	};
 
+	/// @brief Comment field
+	struct CommentField {
+		std::string inner; ///< The comment content.
+		bool trailing = false; ///< Whether the comment is trailing (i.e., appears after code on the same line).
+	};
+
 	/// @brief A class field.
 	struct Field {
 		size_t field_id; ///< The index of the field. This starts from 0 and counts up across all classes.
 		std::string parent; ///< The name of the parent class.
-		std::variant<InlineField, FunctionBindField, PadField, MemberField> inner;
+		std::variant<InlineField, FunctionBindField, PadField, MemberField, CommentField> inner;
 
 		/// @brief Cast the field into a variant type. This is useful to extract data from the field.
 		template <typename T>
