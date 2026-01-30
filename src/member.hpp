@@ -29,6 +29,7 @@ namespace broma {
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			MemberField f;
 			scratch->wip_field.inner = f;
+			scratch->wip_field.line = input.position().line;
 		}
 	};
 
@@ -127,6 +128,7 @@ namespace broma {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			scratch->wip_field.get_as<PadField>()->amount = scratch->wip_bind;
+			scratch->wip_field.line = input.position().line;
 		}
 	};
 } // namespace broma

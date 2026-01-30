@@ -167,6 +167,7 @@ namespace broma {
 		size_t field_id; ///< The index of the field. This starts from 0 and counts up across all classes.
 		std::string parent; ///< The name of the parent class.
 		std::variant<InlineField, FunctionBindField, PadField, MemberField> inner;
+		size_t line = 0; ///< The line number where this class was defined.
 
 		/// @brief Cast the field into a variant type. This is useful to extract data from the field.
 		template <typename T>
@@ -195,6 +196,8 @@ namespace broma {
 		std::vector<std::string> superclasses; ///< Parent classes that the current class inherits.
 										  ///< This includes parent classes, and any classes declared in a `[[depends(...)]]` attribute.
 		std::vector<Field> fields; ///< All the fields parsed in the class.
+		std::string source; ///< The source file where this class was defined.
+		size_t line = 0; ///< The line number where this class was defined.
 
 		inline bool operator==(Class const& c) const {
 			return name == c.name;
@@ -209,6 +212,8 @@ namespace broma {
 		FunctionProto prototype; ///< The free function's signature.
 		PlatformNumber binds; ///< The offsets of free function, separated per platform.
 		std::string inner; ///< The (optional) inline body of the function as a raw string.
+		std::string source; ///< The source file where this function was defined.
+		size_t line = 0; ///< The line number where this function was defined.
 	};
 
 	/// @brief A header file to be imported.

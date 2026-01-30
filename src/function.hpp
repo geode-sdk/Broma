@@ -86,6 +86,8 @@ namespace broma {
 			f.binds.win = normalize_platform_number(f.binds.win, has_inline);
 
 			f.inner = scratch->wip_fn_body;
+			f.source = input.input().source();
+			f.line = input.position().line;
 
 			// clear state (there's probably a better way to do this too)
 			scratch->wip_fn_body.clear();
@@ -200,6 +202,7 @@ namespace broma {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			scratch->wip_mem_fn_proto.type = FunctionType::Normal;
+			scratch->wip_field.line = input.position().line;
 		}
 	};
 
@@ -208,6 +211,7 @@ namespace broma {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			scratch->wip_mem_fn_proto.type = FunctionType::Ctor;
+			scratch->wip_field.line = input.position().line;
 		}
 	};
 
