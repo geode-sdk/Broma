@@ -16,10 +16,15 @@ namespace broma {
 			one<'='>,
 			sep, 
 			list<opt<
-				sep,
-				tagged_platform<bind>,
-				sep,
-				tagged_rule<bind, sor<hex, keyword_default, keyword_inline>>
+				sor<seq<
+					sep,
+					tagged_platform<bind>,
+					sep,
+					tagged_rule<bind, sor<hex, keyword_default, keyword_inline>>
+				>, seq<
+					sep, 
+					tagged_rule<bind, keyword_inline>
+				>>
 			>, one<','>>,
 			sep
 		>, sor<function_body, one<';'>>> {};
@@ -50,12 +55,28 @@ namespace broma {
 	};
 
 	template <>
+	struct run_action<tagged_rule<bind, keyword_inline>> {
+		template <typename T>
+		static void apply(T& input, Root* root, ScratchData* scratch) {
+			auto text = input.string();
+
+			scratch->wip_has_explicit_inline = true;
+			for (auto& platform : {&scratch->wip_bind.imac, &scratch->wip_bind.m1, &scratch->wip_bind.ios,
+				&scratch->wip_bind.win, &scratch->wip_bind.android32, &scratch->wip_bind.android64}) {
+				if (*platform == -1) { // don't replace already specified ones
+					*platform = -2;
+				}
+			}
+		}
+	};
+
+	template <>
 	struct run_action<tagged_rule<bind, sor<hex, keyword_default, keyword_inline>>> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			auto text = input.string();
 
-			std::size_t out = -1;
+			std::ptrdiff_t out = -1;
 			if (text == "default") {
 				// special internal constant used for normalization
 				// feel free to increment if needed (it isn't exposed anywhere public)
