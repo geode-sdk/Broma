@@ -28,6 +28,12 @@ namespace broma {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			MemberField f;
+
+			if (scratch->wip_platform_block.has_value())
+				f.platform = scratch->wip_platform_block.value();
+			else
+				f.platform = Platform::All;
+
 			scratch->wip_field.inner = f;
 			scratch->wip_field.line = input.position().line;
 		}
@@ -58,11 +64,6 @@ namespace broma {
 	struct run_action<member_expr> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
-			if (scratch->wip_platform_block.has_value())
-				scratch->wip_field.get_as<MemberField>()->platform = scratch->wip_platform_block.value();
-			else
-				scratch->wip_field.get_as<MemberField>()->platform = Platform::None;
-
 			scratch->wip_field.get_as<MemberField>()->type = scratch->wip_type;
 		}
 	};
