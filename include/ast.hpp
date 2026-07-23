@@ -139,7 +139,7 @@ namespace broma {
 
 	/// @brief A class's member variables.
 	struct MemberField {
-		Platform platform; ///< For platform-specific members, all platforms this member is defined on 
+		Platform platform = Platform::All; ///< For platform-specific members, all platforms this member is defined on 
 		std::string name; ///< The name of the field.
 		Type type; ///< The type of the field.
 		size_t count = 0; ///< The number of elements in the field when it's an array (pretty much unused since we use std::array).
