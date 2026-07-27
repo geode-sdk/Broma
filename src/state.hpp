@@ -2,6 +2,7 @@
 
 #include <tao/pegtl.hpp>
 #include <ast.hpp>
+#include <unordered_set>
 
 namespace broma {
 	/// @brief Base class for all Broma actions.
@@ -31,6 +32,7 @@ namespace broma {
 		Platform wip_import_platform = Platform::All;
 
 		std::vector<tao::pegtl::parse_error> errors;
+		std::unordered_set<std::string> included_files;
 		const std::filesystem::path include_path;
 	};
 } // namespace broma

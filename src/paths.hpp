@@ -5,24 +5,26 @@
 #include <filesystem>
 #include <string>
 
-#ifdef _WIN32
+namespace broma {
+	#ifdef _WIN32
 
-#include <Windows.h>
-#include <stringapiset.h>
+	#include <Windows.h>
+	#include <stringapiset.h>
 
-inline std::string wideToUtf8(std::wstring_view wstr) {
-	int count = WideCharToMultiByte(CP_UTF8, 0, wstr.data(), wstr.size(), NULL, 0, NULL, NULL);
-	std::string str(count, 0);
-	WideCharToMultiByte(CP_UTF8, 0, wstr.data(), wstr.size(), &str[0], count, NULL, NULL);
-	return str;
-}
+	inline std::string wideToUtf8(std::wstring_view wstr) {
+		int count = WideCharToMultiByte(CP_UTF8, 0, wstr.data(), wstr.size(), NULL, 0, NULL, NULL);
+		std::string str(count, 0);
+		WideCharToMultiByte(CP_UTF8, 0, wstr.data(), wstr.size(), &str[0], count, NULL, NULL);
+		return str;
+	}
 
-#endif
+	#endif
 
-inline std::string pathToString(std::filesystem::path const& path) {
-#ifdef _WIN32
-	return wideToUtf8(path.native());
-#else
-	return path.string();
-#endif
-}
+	inline std::string pathToString(std::filesystem::path const& path) {
+	#ifdef _WIN32
+		return wideToUtf8(path.native());
+	#else
+		return path.string();
+	#endif
+	}
+} // namespace broma
