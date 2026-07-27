@@ -10,7 +10,7 @@ using namespace tao::pegtl;
 
 namespace broma {
 	/// @brief A class member variable.
-	struct member_expr : 
+	struct member_expr :
 		seq<
 			rule_begin<member_expr>,
 			opt<tagged_platform<member_expr>>,
@@ -45,7 +45,6 @@ namespace broma {
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			if (scratch->wip_platform_block.has_value()) {
 				throw parse_error("cannot use this inside a platform expression", input);
-				return;
 			}
 
 			scratch->wip_field.get_as<MemberField>()->platform = str_to_platform(input.string());
@@ -108,7 +107,6 @@ namespace broma {
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			if (!scratch->wip_platform_block.has_value()) {
 				throw parse_error("must specify padding if not using platform expression", input);
-				return;
 			}
 
 			size_t out = std::stoul(input.string(), nullptr, 16);

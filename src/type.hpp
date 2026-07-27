@@ -11,7 +11,7 @@ namespace broma {
 	struct long_qualified : if_then_else<keyword_long, opt<rpad_space<keyword_long>>, opt<qualified>> {};
 
 	/// @brief A C++ type declaration.
-	struct type_content : 
+	struct type_content :
 		if_then_else<
 			at<ellipsis>,
 			ellipsis,
@@ -69,7 +69,7 @@ namespace broma {
 	/// @brief The name of a function argument.
 	struct arg_name : opt<identifier> {};
 	/// @brief A list of function arguments (including parentheses).
-	struct arg_list : 
+	struct arg_list :
 		seq<
 			rule_begin<arg_list>,
 			one<'('>,

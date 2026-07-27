@@ -2,6 +2,7 @@
 
 #include "basic_components.hpp"
 #include "state.hpp"
+#include "paths.hpp"
 
 namespace broma {
 	/// @brief The inner name of the file to be included.
@@ -19,12 +20,19 @@ namespace broma {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			std::filesystem::path name = input.string();
-			if (!std::filesystem::exists(name))
+			// find relative to file path first
+			if (std::filesystem::exists(scratch->include_path / name))
 				name = scratch->include_path / name;
+			else if (!std::filesystem::exists(name))
+				throw parse_error("could not resolve path for included file: " + pathToString(name), input.position());
 
-			file_input<> file_input(name);
+			std::filesystem::path canonical = std::filesystem::canonical(name);
+			if (!scratch->included_files.insert(pathToString(canonical)).second)
+				return;
 
-			parse<root_grammar, broma::run_action>(file_input, root, scratch);
+			file_input<> include_input(name);
+
+			parse<must<root_grammar>, broma::run_action>(include_input, root, scratch);
 		}
 	};
 } // namespace broma

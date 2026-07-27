@@ -1,4 +1,3 @@
-#include "ast.hpp"
 #include <broma.hpp>
 #include <iostream>
 
@@ -134,14 +133,23 @@ void print_ast(broma::Root& ast) {
 }
 
 int main() {
-    try {
-        auto parsed_class = broma::parse_file("class.bro");
-        print_ast(parsed_class);
+    auto parsed_class = broma::parse_file("class.bro");
+    if (parsed_class.isErr()) {
+        std::cout << "Testing 'class.bro' failed with error(s):\n";
+        for (auto& msg : parsed_class.unwrapErr().messages)
+            std::cout << "\t" << msg << '\n';
+        return 1;
+    }
+    print_ast(parsed_class.unwrap());
 
-        auto parsed_free = broma::parse_file("free.bro");
-        print_ast(parsed_free);
+    auto parsed_free = broma::parse_file("free.bro");
+    if (parsed_free.isErr()) {
+        std::cout << "Testing 'free.bro' failed with error(s):\n";
+        for (auto& msg : parsed_free.unwrapErr().messages)
+            std::cout << "\t" << msg << '\n';
+        return 1;
     }
-    catch (std::exception const& err) {
-        std::cout << "Test failed with error: " << err.what() << '\n';
-    }
+    print_ast(parsed_free.unwrap());
+
+    return 0;
 }

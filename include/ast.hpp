@@ -3,11 +3,13 @@
 #include <string>
 #include <vector>
 #include <variant>
-#include <map>
 #include <algorithm>
-#include <iostream>
 
 namespace broma {
+	struct ParseError {
+		std::vector<std::string> messages; ///< One or more parse errors, e.g. from duplicate classes.
+	};
+
 	/// @brief The platform currently being processed in a bind statement.
 	enum class Platform {
 		None = 0,
@@ -97,7 +99,7 @@ namespace broma {
 					return false;
 				}
 			}
-			
+
 			return true;
 		}
 	};

@@ -14,7 +14,7 @@ namespace broma {
 	struct bind :
 		seq<rule_begin<bind>, opt_must<
 			one<'='>,
-			sep, 
+			sep,
 			list<opt<
 				sor<seq<
 					sep,
@@ -22,7 +22,7 @@ namespace broma {
 					sep,
 					tagged_rule<bind, sor<hex, keyword_default, keyword_inline>>
 				>, seq<
-					sep, 
+					sep,
 					tagged_rule<bind, keyword_inline>
 				>>
 			>, one<','>>,
