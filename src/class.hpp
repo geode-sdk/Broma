@@ -3,7 +3,6 @@
 #include <tao/pegtl.hpp>
 using namespace tao::pegtl;
 
-#include "attribute.hpp"
 #include "basic_components.hpp"
 #include "function.hpp"
 #include "member.hpp"

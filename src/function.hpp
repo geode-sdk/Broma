@@ -60,7 +60,7 @@ namespace broma {
 	}
 
 	/// @brief A full function (prototype and bindings).
-	struct function : 
+	struct function :
 		seq<rule_begin<function>, function_proto, sep, bind>
 		{};
 

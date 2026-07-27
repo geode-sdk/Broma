@@ -24,13 +24,13 @@ namespace broma {
 
 	struct docs_literal : until<eolf> {};
 	struct docs_attribute : seq<ascii::string<'/', '/', '/'>, tagged_rule<docs_attribute, docs_literal> > {};
-	
+
 	// seq<ascii::string<'/', '*'>, tagged_rule<docs_attribute, string_literal>, until<seq<ascii::string<'*', '/'>>>> /*basic_attribute<TAO_PEGTL_KEYWORD("docs"), tagged_rule<docs_attribute, string_literal>>*/ {};
 	struct depends_attribute : basic_attribute<TAO_PEGTL_KEYWORD("depends"), tagged_rule<depends_attribute, qualified>> {};
 
 	template <typename Attribute>
 	struct platform_list : seq<
-		sep, 
+		sep,
 		list<opt<
 			sep,
 			tagged_platform<Attribute>,
@@ -39,7 +39,7 @@ namespace broma {
 		sep
 	> {};
 
-	struct link_attribute : basic_attribute<TAO_PEGTL_KEYWORD("link"), tagged_rule<link_attribute, 
+	struct link_attribute : basic_attribute<TAO_PEGTL_KEYWORD("link"), tagged_rule<link_attribute,
 		seq<
 			rule_begin<link_attribute>,
 			opt<platform_list<link_attribute>>
@@ -58,7 +58,7 @@ namespace broma {
 	/// @brief All allowed C++ attributes.
 	///
 	/// Currently, this includes the `docs(...)`, `depends(...)`, `link(...)` and `missing(...)` attributes.
-	struct attribute_normal : 
+	struct attribute_normal :
 		seq<
 			ascii::string<'[', '['>,
 			if_then_else<
@@ -74,7 +74,7 @@ namespace broma {
 		> {};
 
 	struct attribute : seq<
-		sep, 
+		sep,
 		opt<list<docs_attribute, sep>>,
 		sep,
 		opt<attribute_normal>

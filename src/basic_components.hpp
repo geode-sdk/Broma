@@ -5,7 +5,7 @@ using namespace tao::pegtl;
 
 namespace broma {
 	/// @brief C and C++-style comments.
-	struct comment : 
+	struct comment :
 		disable<sor<
 			seq<at<ascii::string<'/', '/'>, not_at<one<'/'>>>, until<eolf>>,
 			seq<ascii::string<'/', '*'>, until<seq<ascii::string<'*', '/'>>>>
