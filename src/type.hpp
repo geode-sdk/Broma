@@ -8,24 +8,20 @@ using namespace tao::pegtl;
 
 namespace broma {
 	/// @brief A C++ qualified identifier with the "long" keyword.
-	struct long_qualified : if_then_else<keyword_long, opt<rpad_space<keyword_long>>, opt<qualified>> {};
+	struct long_qualified : if_then_else<keyword_long, opt<rpad_space<keyword_long>>, qualified> {};
 
 	/// @brief A C++ type declaration.
 	struct type_content :
-		if_then_else<
-			at<ellipsis>,
-			ellipsis,
-			if_then_must<
-				pad_space<sor<keyword_const, keyword_struct>>,
+		if_then_must<
+			pad_space<sor<keyword_const, keyword_struct>>,
 
-				sor<pad_space<keyword_const>, pad_space<keyword_struct>, success>,
+			sor<pad_space<keyword_const>, pad_space<keyword_struct>, success>,
 
-				if_then_else<pad_space<keyword_unsigned>, opt<long_qualified>, long_qualified>,
+			if_then_else<pad_space<keyword_unsigned>, opt<long_qualified>, long_qualified>,
 
-				opt<rpad_space<keyword_const>>,
-				star<seq<sep, one<'&', '*'>>>,
-				opt<rpad_space<keyword_const>>
-			>
+			opt<rpad_space<keyword_const>>,
+			star<seq<sep, one<'&', '*'>>>,
+			opt<rpad_space<keyword_const>>
 		> {};
 
 	/// @brief A C++ type declaration, with starting whitespace.
@@ -68,6 +64,8 @@ namespace broma {
 
 	/// @brief The name of a function argument.
 	struct arg_name : opt<identifier> {};
+	/// @brief An argument item sequence of both type and argument name.
+	struct arg_item : seq<sep, tagged_rule<arg_item, type>, sep, arg_name, sep> {};
 	/// @brief A list of function arguments (including parentheses).
 	struct arg_list :
 		seq<
@@ -76,16 +74,31 @@ namespace broma {
 			if_then_else<
 				at<one<')'>>,
 				success,
-				list<seq<
-					sep,
-					tagged_rule<arg_list, type>,
-					sep,
-					arg_name,
-					sep
-				>, one<','>>
+				list<
+					sor<
+						seq<sep, tagged_rule<arg_list, ellipsis>, sep>,
+						arg_item
+					>,
+				one<','>>
 			>,
 			one<')'>
 		> {};
+
+	template <>
+	struct run_action<tagged_rule<arg_item, type>> {
+		template <typename T>
+		static void apply(T& input, Root* root, ScratchData* scratch) {
+			if (scratch->is_class) {
+				if (scratch->wip_mem_fn_proto.is_variadic)
+					throw parse_error("Variadic ellipsis must be the last parameter", input.position());
+				scratch->wip_mem_fn_proto.args.push_back({scratch->wip_type, ""});
+			} else {
+				if (scratch->wip_fn_proto.is_variadic)
+					throw parse_error("Variadic ellipsis must be the last parameter", input.position());
+				scratch->wip_fn_proto.args.push_back({scratch->wip_type, ""});
+			}
+		}
+	};
 
 	template <>
 	struct run_action<rule_begin<arg_list>> {
@@ -101,14 +114,17 @@ namespace broma {
 	};
 
 	template <>
-	struct run_action<tagged_rule<arg_list, type>> {
+	struct run_action<tagged_rule<arg_list, ellipsis>> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			if (scratch->is_class) {
-				scratch->wip_mem_fn_proto.args.push_back({scratch->wip_type, ""});
-			}
-			else {
-				scratch->wip_fn_proto.args.push_back({scratch->wip_type, ""});
+				if (scratch->wip_mem_fn_proto.is_variadic)
+					throw parse_error("Variadic ellipsis can only appear once", input.position());
+				scratch->wip_mem_fn_proto.is_variadic = true;
+			} else {
+				if (scratch->wip_fn_proto.is_variadic)
+					throw parse_error("Variadic ellipsis can only appear once", input.position());
+				scratch->wip_fn_proto.is_variadic = true;
 			}
 		}
 	};
@@ -122,8 +138,7 @@ namespace broma {
 					scratch->wip_mem_fn_proto.args.back().second = std::string("p") + std::to_string(scratch->wip_mem_fn_proto.args.size() - 1);
 				else
 					scratch->wip_mem_fn_proto.args.back().second = input.string();
-				}
-			else {
+			} else {
 				if (input.string() == "")
 					scratch->wip_fn_proto.args.back().second = std::string("p") + std::to_string(scratch->wip_fn_proto.args.size() - 1);
 				else

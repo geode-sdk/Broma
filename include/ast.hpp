@@ -88,6 +88,8 @@ namespace broma {
 		Type ret; ///< The return type of the function.
 		std::vector<std::pair<Type, std::string>> args; ///< All arguments, represented by their type and their name.
 		std::string name; ///< The function's name.
+		bool is_variadic = false; ///< Whether this function takes a variable amount of arguments.
+								  ///< The C++ ellipsis used to indicate this is removed from the args property.
 
 		inline bool operator==(FunctionProto const& f) const {
 			if (name != f.name || args.size() != f.args.size()) {
@@ -195,8 +197,7 @@ namespace broma {
 	struct Class {
 		Attributes attributes;
 		std::string name; ///< The name of the class.
-		std::vector<std::string> superclasses; ///< Parent classes that the current class inherits.
-										  ///< This includes parent classes, and any classes declared in a `[[depends(...)]]` attribute.
+		std::vector<std::string> superclasses; ///< Parent classes that this class inherits from.
 		std::vector<Field> fields; ///< All the fields parsed in the class.
 		std::string source; ///< The source file where this class was defined.
 		size_t line = 0; ///< The line number where this class was defined.
