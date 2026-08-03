@@ -14,7 +14,7 @@ class Test {
         ;;;;;
     }
 
-    void thing(int c) = win 0x5, imac 0x8, m1 0x4, ios default;
+    private void thing(int c) = win 0x5, imac 0x8, m1 0x4, ios default;
 
     // result: win inline, imac inline, m1 inline, ios inline
     void normal_inline(int b) {
@@ -30,6 +30,8 @@ class Test {
         PAD = 0x5;
         int m_perPlatformTest;
     }
+
+    win char m_oneLinerPlat;
 
     PAD = mac 0x38, ios 0x984, win 0x1;
     char m_testMain;
