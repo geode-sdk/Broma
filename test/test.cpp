@@ -16,7 +16,7 @@ void print_special_constant(std::ptrdiff_t num) {
 }
 
 void print_func(broma::FunctionProto& func, broma::PlatformNumber& addrs, std::string inner = "") {
-
+    std::cout << "\tis variadic? " << func.is_variadic << "\n";
     std::cout << "\tmissing: " << (long)func.attributes.missing << "\n";
     std::cout << "\tsince: " << func.attributes.since << "\n";
     std::cout << "\t" << func.ret.name << " " << func.name << "(";
@@ -47,6 +47,18 @@ void print_func(broma::FunctionProto& func, broma::PlatformNumber& addrs, std::s
     }
 
     std::cout << std::dec;
+}
+
+inline std::string nameForAccess(broma::AccessModifier access) {
+    using namespace broma;
+
+    switch (access) {
+        case AccessModifier::Public: return "public";
+        case AccessModifier::Protected: return "protected";
+        case AccessModifier::Private: return "private";
+        default:
+            return "public";
+    }
 }
 
 inline std::string nameForPlatform(broma::Platform platform) {
@@ -81,7 +93,6 @@ void print_member(std::string name, broma::Platform handles, std::size_t count) 
         }
     }
 
-
     std::cout << "}\n";
 }
 
@@ -112,11 +123,7 @@ void print_ast(broma::Root& ast) {
         std::cout << "class " << cls.name << " {\n";
         for (auto field : cls.fields) {
             if (auto func = field.get_as<broma::FunctionBindField>()) {
-                if (func->prototype.access == broma::AccessModifier::Protected) {
-                    std::cout << "Protected!!!\n";
-                } else {
-                    std::cout << "Not protected.\n";
-                }
+                std::cout << "access modifier: " << nameForAccess(func->prototype.access) << "\n";
                 print_func(func->prototype, func->binds, func->inner);
             } else if (auto member = field.get_as<broma::MemberField>()) {
                 print_member(member->name, member->platform, member->count);
