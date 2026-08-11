@@ -13,6 +13,8 @@ namespace broma {
 	struct member_expr :
 		seq<
 			rule_begin<member_expr>,
+			opt<attribute>,
+			sep,
 			opt<tagged_platform<member_expr>>,
 			type,
 			whitespace,
@@ -27,6 +29,7 @@ namespace broma {
 	struct run_action<rule_begin<member_expr>> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
+			scratch->wip_attributes = Attributes();
 			MemberField f;
 
 			if (scratch->wip_platform_block.has_value())
@@ -63,7 +66,26 @@ namespace broma {
 	struct run_action<member_expr> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
+			auto mf = scratch->wip_field.get_as<MemberField>();
+			mf->attributes = scratch->wip_attributes;
+
+			for (auto& old_name : mf->attributes.renamed_from) {
+				if (old_name == mf->name)
+					throw parse_error("renamed_from attribute value cannot match the member's current name", input.position());
+			}
+
+			mf->platform &= ~mf->attributes.missing;
+
+			if (mf->platform == Platform::None) {
+				throw parse_error(
+					"member is marked missing on every platform it's declared for; "
+					"it can never exist anywhere", input.position()
+				);
+			}
+
 			scratch->wip_field.get_as<MemberField>()->type = scratch->wip_type;
+
+			scratch->wip_attributes = Attributes();
 		}
 	};
 

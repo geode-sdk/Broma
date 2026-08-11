@@ -55,6 +55,8 @@ namespace broma {
 
 	struct since_attribute : basic_attribute<TAO_PEGTL_KEYWORD("since"), tagged_rule<since_attribute, string_literal>> {};
 
+	struct renamed_from_attribute : basic_attribute<TAO_PEGTL_KEYWORD("renamed_from"), tagged_rule<renamed_from_attribute, identifier>> {};
+
 	/// @brief All allowed C++ attributes.
 	///
 	/// Currently, this includes the `docs(...)`, `depends(...)`, `link(...)` and `missing(...)` attributes.
@@ -64,11 +66,14 @@ namespace broma {
 			if_then_else<
 				at<ascii::string<']', ']'>>,
 				success,
-				list<seq<
-					sep,
-					sor<depends_attribute, link_attribute, missing_attribute, since_attribute>,
-					sep
-				>, one<','>>
+				list<
+					seq<
+						sep,
+						sor<depends_attribute, link_attribute, missing_attribute, since_attribute, renamed_from_attribute>,
+						sep
+					>,
+					one<','>
+				>
 			>,
 			ascii::string<']', ']'>
 		> {};
@@ -143,6 +148,16 @@ namespace broma {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			scratch->wip_attributes.since = input.string().substr(1, input.string().size() - 2);
+		}
+	};
+
+	// renamed_from
+
+	template <>
+	struct run_action<tagged_rule<renamed_from_attribute, identifier>> {
+		template <typename T>
+		static void apply(T& input, Root* root, ScratchData* scratch) {
+			scratch->wip_attributes.renamed_from.push_back(input.string());
 		}
 	};
 

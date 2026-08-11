@@ -78,12 +78,19 @@ inline std::string nameForPlatform(broma::Platform platform) {
     }
 }
 
-void print_member(std::string name, broma::Platform handles, std::size_t count) {
+void print_member(std::string name, broma::Platform handles, std::size_t count, broma::Attributes attrs) {
     using namespace broma;
 
-    std::cout << "\t" << name << "{";
+    if (!attrs.renamed_from.empty())
+        std::cout << "old names renamed from: ";
 
-    if (handles == Platform::None) {
+    for (auto oldName : attrs.renamed_from) {
+        std::cout << oldName << ", ";
+    }
+
+    std::cout << "\n\t" << name << "{";
+
+    if (handles == Platform::All) {
         std::cout << "all";
     } else {
         for (auto platform : {Platform::MacArm, Platform::MacIntel, Platform::Windows, Platform::iOS, Platform::Android}) {
@@ -126,7 +133,7 @@ void print_ast(broma::Root& ast) {
                 std::cout << "access modifier: " << nameForAccess(func->prototype.access) << "\n";
                 print_func(func->prototype, func->binds, func->inner);
             } else if (auto member = field.get_as<broma::MemberField>()) {
-                print_member(member->name, member->platform, member->count);
+                print_member(member->name, member->platform, member->count, member->attributes);
             } else if (auto pad = field.get_as<broma::PadField>()) {
                 print_pad(pad->amount);
             }
