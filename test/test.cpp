@@ -15,10 +15,50 @@ void print_special_constant(std::ptrdiff_t num) {
     std::cout << "0x" << num;
 }
 
+inline std::string nameForAccess(broma::AccessModifier access) {
+    using namespace broma;
+
+    switch (access) {
+        case AccessModifier::Public: return "public";
+        case AccessModifier::Protected: return "protected";
+        case AccessModifier::Private: return "private";
+        default:
+            return "public";
+    }
+}
+
+inline std::string nameForPlatform(broma::Platform platform) {
+    using namespace broma;
+
+    switch (platform) {
+        case Platform::MacArm: return "m1";
+        case Platform::MacIntel: return "imac";
+        case Platform::Mac: return "mac";
+        case Platform::Windows: return "win";
+        case Platform::iOS: return "ios";
+        case Platform::Android: return "android";
+        case Platform::Android32: return "android32";
+        case Platform::Android64: return "android64";
+        default:
+            return "win";
+    }
+}
+
 void print_func(broma::FunctionProto& func, broma::PlatformNumber& addrs, std::string inner = "") {
     std::cout << "\tis variadic? " << func.is_variadic << "\n";
-    std::cout << "\tmissing: " << (long)func.attributes.missing << "\n";
-    std::cout << "\tsince: " << func.attributes.since << "\n";
+
+    std::cout << "\tmissing: ";
+    if (func.attributes.missing == broma::Platform::None) {
+        std::cout << "None";
+    } else {
+        for (auto platform : {broma::Platform::MacArm, broma::Platform::MacIntel, broma::Platform::Windows, broma::Platform::iOS, broma::Platform::Android}) {
+            if ((func.attributes.missing & platform) != broma::Platform::None) {
+                std::cout << nameForPlatform(platform) << ", ";
+            }
+        }
+    }
+
+    std::cout << "\n\tsince: " << func.attributes.since << "\n";
     std::cout << "\t" << func.ret.name << " " << func.name << "(";
     for (auto arg : func.args) {
         std::cout << arg.first.name << " " << arg.second << ", ";
@@ -47,35 +87,6 @@ void print_func(broma::FunctionProto& func, broma::PlatformNumber& addrs, std::s
     }
 
     std::cout << std::dec;
-}
-
-inline std::string nameForAccess(broma::AccessModifier access) {
-    using namespace broma;
-
-    switch (access) {
-        case AccessModifier::Public: return "public";
-        case AccessModifier::Protected: return "protected";
-        case AccessModifier::Private: return "private";
-        default:
-            return "public";
-    }
-}
-
-inline std::string nameForPlatform(broma::Platform platform) {
-    using namespace broma;
-
-    switch (platform) {
-        case Platform::MacArm: return "m1";
-        case Platform::MacIntel: return "imac";
-        case Platform::Mac: return "mac";
-        case Platform::Windows: return "win";
-        case Platform::iOS: return "ios";
-        case Platform::Android: return "android";
-        case Platform::Android32: return "android32";
-        case Platform::Android64: return "android64";
-        default:
-            return "win";
-    }
 }
 
 void print_member(std::string name, broma::Platform handles, std::size_t count, broma::Attributes attrs) {

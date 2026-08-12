@@ -30,6 +30,8 @@ namespace broma {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			scratch->wip_attributes = Attributes();
+			// inherit parent class's missing attribute
+			scratch->wip_attributes.missing = scratch->wip_class.attributes.missing;
 			MemberField f;
 
 			if (scratch->wip_platform_block.has_value())
@@ -74,12 +76,11 @@ namespace broma {
 					throw parse_error("renamed_from attribute value cannot match the member's current name", input.position());
 			}
 
+			// fold missing into platform so it reflects which platforms the member actually exists
 			mf->platform &= ~mf->attributes.missing;
-
 			if (mf->platform == Platform::None) {
 				throw parse_error(
-					"member is marked missing on every platform it's declared for; "
-					"it can never exist anywhere", input.position()
+					"member is marked missing on every platform it's declared for", input.position()
 				);
 			}
 

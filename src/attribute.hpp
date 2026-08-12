@@ -85,7 +85,6 @@ namespace broma {
 		opt<attribute_normal>
 	> {};
 
-
 	// depends
 
 	template <>
@@ -112,7 +111,7 @@ namespace broma {
 	struct run_action<rule_begin<link_attribute>> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
-			scratch->wip_attributes.links = Platform::None;
+			// no reset
 		}
 	};
 
@@ -130,9 +129,10 @@ namespace broma {
 	struct run_action<rule_begin<missing_attribute>> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
-			scratch->wip_attributes.missing = Platform::None;
+			// no reset
 		}
 	};
+
 	template <>
 	struct run_action<tagged_platform<missing_attribute>> {
 		template <typename T>

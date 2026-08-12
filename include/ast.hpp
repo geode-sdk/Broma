@@ -55,7 +55,7 @@ namespace broma {
 	}
 
 	inline Platform operator~(Platform a) {
-		return static_cast<Platform>(~static_cast<int>(a));
+		return static_cast<Platform>(~static_cast<int>(a) & static_cast<int>(Platform::All));
 	}
 
 	/// @brief Binding offsets for each platform.
