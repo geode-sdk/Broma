@@ -26,7 +26,9 @@ namespace broma {
 	struct docs_attribute : seq<ascii::string<'/', '/', '/'>, tagged_rule<docs_attribute, docs_literal> > {};
 
 	// seq<ascii::string<'/', '*'>, tagged_rule<docs_attribute, string_literal>, until<seq<ascii::string<'*', '/'>>>> /*basic_attribute<TAO_PEGTL_KEYWORD("docs"), tagged_rule<docs_attribute, string_literal>>*/ {};
-	struct depends_attribute : basic_attribute<TAO_PEGTL_KEYWORD("depends"), tagged_rule<depends_attribute, qualified>> {};
+	struct depends_attribute : basic_attribute<TAO_PEGTL_KEYWORD("depends"),
+		list<seq<sep, tagged_rule<depends_attribute, qualified>, sep>, one<','>>
+	> {};
 
 	template <typename Attribute>
 	struct platform_list : seq<
@@ -55,7 +57,9 @@ namespace broma {
 
 	struct since_attribute : basic_attribute<TAO_PEGTL_KEYWORD("since"), tagged_rule<since_attribute, string_literal>> {};
 
-	struct renamed_from_attribute : basic_attribute<TAO_PEGTL_KEYWORD("renamed_from"), tagged_rule<renamed_from_attribute, identifier>> {};
+	struct renamed_from_attribute : basic_attribute<TAO_PEGTL_KEYWORD("renamed_from"),
+		list<seq<sep, tagged_rule<renamed_from_attribute, identifier>, sep>, one<','>>
+	> {};
 
 	/// @brief All allowed C++ attributes.
 	///
