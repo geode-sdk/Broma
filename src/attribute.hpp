@@ -26,7 +26,9 @@ namespace broma {
 	struct docs_attribute : seq<ascii::string<'/', '/', '/'>, tagged_rule<docs_attribute, docs_literal> > {};
 
 	// seq<ascii::string<'/', '*'>, tagged_rule<docs_attribute, string_literal>, until<seq<ascii::string<'*', '/'>>>> /*basic_attribute<TAO_PEGTL_KEYWORD("docs"), tagged_rule<docs_attribute, string_literal>>*/ {};
-	struct depends_attribute : basic_attribute<TAO_PEGTL_KEYWORD("depends"), tagged_rule<depends_attribute, qualified>> {};
+	struct depends_attribute : basic_attribute<TAO_PEGTL_KEYWORD("depends"),
+		list<seq<sep, tagged_rule<depends_attribute, qualified>, sep>, one<','>>
+	> {};
 
 	template <typename Attribute>
 	struct platform_list : seq<
@@ -55,6 +57,10 @@ namespace broma {
 
 	struct since_attribute : basic_attribute<TAO_PEGTL_KEYWORD("since"), tagged_rule<since_attribute, string_literal>> {};
 
+	struct renamed_from_attribute : basic_attribute<TAO_PEGTL_KEYWORD("renamed_from"),
+		list<seq<sep, tagged_rule<renamed_from_attribute, identifier>, sep>, one<','>>
+	> {};
+
 	/// @brief All allowed C++ attributes.
 	///
 	/// Currently, this includes the `docs(...)`, `depends(...)`, `link(...)` and `missing(...)` attributes.
@@ -64,11 +70,14 @@ namespace broma {
 			if_then_else<
 				at<ascii::string<']', ']'>>,
 				success,
-				list<seq<
-					sep,
-					sor<depends_attribute, link_attribute, missing_attribute, since_attribute>,
-					sep
-				>, one<','>>
+				list<
+					seq<
+						sep,
+						sor<depends_attribute, link_attribute, missing_attribute, since_attribute, renamed_from_attribute>,
+						sep
+					>,
+					one<','>
+				>
 			>,
 			ascii::string<']', ']'>
 		> {};
@@ -79,7 +88,6 @@ namespace broma {
 		sep,
 		opt<attribute_normal>
 	> {};
-
 
 	// depends
 
@@ -107,7 +115,7 @@ namespace broma {
 	struct run_action<rule_begin<link_attribute>> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
-			scratch->wip_attributes.links = Platform::None;
+			// no reset
 		}
 	};
 
@@ -125,9 +133,10 @@ namespace broma {
 	struct run_action<rule_begin<missing_attribute>> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
-			scratch->wip_attributes.missing = Platform::None;
+			// no reset
 		}
 	};
+
 	template <>
 	struct run_action<tagged_platform<missing_attribute>> {
 		template <typename T>
@@ -143,6 +152,16 @@ namespace broma {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			scratch->wip_attributes.since = input.string().substr(1, input.string().size() - 2);
+		}
+	};
+
+	// renamed_from
+
+	template <>
+	struct run_action<tagged_rule<renamed_from_attribute, identifier>> {
+		template <typename T>
+		static void apply(T& input, Root* root, ScratchData* scratch) {
+			scratch->wip_attributes.renamed_from.push_back(input.string());
 		}
 	};
 

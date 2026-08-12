@@ -28,12 +28,22 @@ class Test {
 
     mac, win {
         PAD = 0x5;
+        [[renamed_from(m_winWithoutMac), missing(mac)]]
         int m_perPlatformTest;
     }
 
+    [[renamed_from(m_oldName, m_unkChar1)]]
     win char m_oneLinerPlat;
 
     PAD = mac 0x38, ios 0x984, win 0x1;
     char m_testMain;
     PAD = m1 0x53;
+}
+
+[[missing(mac)]]
+class Derive : Test {
+    virtual ~Derive();
+
+    [[missing(win)]]
+    std::string getAndroidPath();
 }

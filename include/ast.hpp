@@ -54,6 +54,10 @@ namespace broma {
 		return a;
 	}
 
+	inline Platform operator~(Platform a) {
+		return static_cast<Platform>(~static_cast<int>(a) & static_cast<int>(Platform::All));
+	}
+
 	/// @brief Binding offsets for each platform.
 	struct PlatformNumber {
 		ptrdiff_t imac = -1;
@@ -81,6 +85,7 @@ namespace broma {
 		Platform missing = Platform::None; ///< All the platforms that are missing the class or function
 		std::vector<std::string> depends; ///< List of classes that this class or function depends on
 		std::string since; ///< The SDK version that this class or function was introduced in
+		std::vector<std::string> renamed_from; ///< Prior names for the attributed property.
 	};
 
 	struct FunctionProto {
@@ -143,7 +148,8 @@ namespace broma {
 
 	/// @brief A class's member variables.
 	struct MemberField {
-		Platform platform = Platform::All; ///< For platform-specific members, all platforms this member is defined on 
+		Attributes attributes; ///< Attributes associated with the member field.
+		Platform platform = Platform::All; ///< For platform-specific members, all platforms this member is defined on
 		std::string name; ///< The name of the field.
 		Type type; ///< The type of the field.
 		size_t count = 0; ///< The number of elements in the field when it's an array (pretty much unused since we use std::array).
