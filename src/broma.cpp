@@ -15,8 +15,27 @@
 using namespace tao::pegtl;
 
 namespace broma {
+	struct top_comment_expr : comment_expr_base {};
+
+	template <>
+	struct run_action<top_comment_expr> {
+		template <typename T>
+		static void apply(T& input, Root* root, ScratchData* scratch) {
+			auto parsed = extract_comment(input);
+
+			Comment c;
+			c.inner = std::move(parsed.text);
+			c.multiline = parsed.multiline;
+			c.trailing = parsed.trailing;
+			c.source = input.input().source();
+			c.line = input.position().line;
+
+			root->comments.push_back(std::move(c));
+		}
+	};
+
 	/// @brief Broma's top-level grammar.
-	struct root_grammar : until<eof, sep, must<sor<import_expr, include_expr, seq<opt<attribute>, sor<class_statement, function>>>>, sep> {};
+	struct root_grammar : until<eof, sep, must<sor<import_expr, include_expr, top_comment_expr, seq<opt<attribute>, sor<class_statement, function>>>>, sep> {};
 
 	geode::Result<Root, ParseError> parse_file(std::filesystem::path const& fname) {
 		Root root;
