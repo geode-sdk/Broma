@@ -4,6 +4,8 @@
 #include <ast.hpp>
 #include <unordered_set>
 
+#include "paths.hpp"
+
 namespace broma {
 	/// @brief Base class for all Broma actions.
 	///
@@ -34,5 +36,15 @@ namespace broma {
 		std::vector<tao::pegtl::parse_error> errors;
 		std::unordered_set<std::string> included_files;
 		const std::filesystem::path include_path;
+		std::unordered_map<std::string, std::string> source_cache;
+
+		/// @brief Centralized function with caching to handle file path strings.
+		inline std::string const& canonicalizePath(std::filesystem::path const& path) {
+			auto raw = paths::pathToString(path);
+			auto [it, inserted] = source_cache.try_emplace(raw);
+			if (inserted)
+				it->second = paths::canonicalize(path);
+			return it->second;
+		}
 	};
 } // namespace broma

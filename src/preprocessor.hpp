@@ -8,10 +8,20 @@ namespace broma {
 	/// @brief The inner name of the file to be included.
 	struct include_name : until<at<one<'>'>>> {};
 
-	/// @brief A C++ include expression.
+	/// @brief A C++ include expression for Broma files.
+	/// The declarations read from the included file are merged
+	/// into the current result `Root` struct.
+	/// Results can be filtered per source using `Root::filterBySource`.
 	///
 	/// Currently, this only supports angle bracket includes.
-	struct include_expr : seq<ascii::string<'#', 'i', 'n', 'c', 'l', 'u', 'd', 'e'>, sep, one<'<'>, include_name, one<'>'>> {};
+	struct include_expr :
+		seq<
+			ascii::string<'#', 'i', 'n', 'c', 'l', 'u', 'd', 'e'>, // #include
+			sep,
+			one<'<'>,
+			include_name,
+			one<'>'>
+		> {};
 
 	struct root_grammar;
 
@@ -24,10 +34,12 @@ namespace broma {
 			if (std::filesystem::exists(scratch->include_path / name))
 				name = scratch->include_path / name;
 			else if (!std::filesystem::exists(name))
-				throw parse_error("could not resolve path for included file: " + pathToString(name), input.position());
+				throw parse_error("could not resolve path for included file: " + paths::pathToString(name), input.position());
 
-			std::filesystem::path canonical = std::filesystem::canonical(name);
-			if (!scratch->included_files.insert(pathToString(canonical)).second)
+			// realistically a Broma file include either fatally errors or actually resolves
+			// since its existence is already accounted for
+			std::string const& canonical = scratch->canonicalizePath(name);
+			if (!scratch->included_files.insert(canonical).second)
 				return;
 
 			file_input<> include_input(name);
