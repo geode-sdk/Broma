@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_set>
 #include <variant>
 #include <algorithm>
 
@@ -250,6 +251,32 @@ namespace broma {
 				return nullptr;
 
 			return &*it;
+		}
+
+		/// @brief All fields across every class in this Root.
+		inline std::vector<Field*> allFields() {
+			std::vector<Field*> out;
+
+			for (auto& c : classes)
+				for (auto& f : c.fields)
+					out.push_back(&f);
+
+			return out;
+		}
+
+		/// @brief Look up a field by its field_id across every class in this Root.
+		/// Returns nullptr if no field with that id exists.
+		inline Field* getFieldById(size_t field_id) {
+			for (auto& cls : classes) {
+				auto it = std::find_if(cls.fields.begin(), cls.fields.end(), [field_id](Field& f) {
+					return f.field_id == field_id;
+				});
+
+				if (it != cls.fields.end())
+					return &*it;
+			}
+
+			return nullptr;
 		}
 
 		/// @brief Every distinct source file that contributed content to this Root.
