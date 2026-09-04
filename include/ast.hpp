@@ -173,11 +173,19 @@ namespace broma {
 		std::string inner; ///< The inline body of the function as a raw string.
 	};
 
+	/// @brief A comment (`// ...` or `/* ... */`) found inside a class body.
+	struct CommentField {
+		std::string inner; ///< The raw comment string.
+		bool multiline = false; ///< Whether this was a `/* ... */` style comment, as opposed to a `//` one.
+		bool trailing = false; ///< Whether the comment follows other code on the same line (e.g. `int x; // note`),
+							   /// as opposed to being on its own line.
+	};
+
 	/// @brief A class field.
 	struct Field {
 		size_t field_id; ///< The index of the field. This starts from 0 and counts up across all classes.
 		std::string parent; ///< The name of the parent class.
-		std::variant<InlineField, FunctionBindField, PadField, MemberField> inner;
+		std::variant<InlineField, FunctionBindField, PadField, MemberField, CommentField> inner;
 		size_t line = 0; ///< The line number where this class was defined.
 
 		/// @brief Cast the field into a variant type. This is useful to extract data from the field.
@@ -234,6 +242,16 @@ namespace broma {
 		size_t line = 0; ///< The line number where this header was imported at in the file.
 	};
 
+	/// @brief A comment (`// ...` or `/* ... */`) found outside of any class or function.
+	struct Comment {
+		std::string inner; ///< The raw comment string.
+		bool multiline = false; ///< Whether this was a `/* ... */` style comment, as opposed to a `//` one.
+		bool trailing = false; ///< Whether the comment follows other code on the same line (e.g. `int x; // note`),
+							   /// as opposed to being on its own line.
+		std::string source; ///< The source file where this comment was defined.
+		size_t line = 0; ///< The line number where this comment was defined.
+	};
+
 	/// @brief Broma's root grammar (the root AST).
 	///
 	/// See the user's guide for an example on how to traverse this AST.
@@ -241,6 +259,7 @@ namespace broma {
 		std::vector<Class> classes;
 		std::vector<Function> functions;
 		std::vector<Header> headers;
+		std::vector<Comment> comments;
 
 		inline Class* operator[](std::string const& name) {
 			auto it = std::find_if(classes.begin(), classes.end(), [name](Class& cls) {
