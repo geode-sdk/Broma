@@ -90,11 +90,11 @@ namespace broma {
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			if (scratch->is_class) {
 				if (scratch->wip_mem_fn_proto.is_variadic)
-					throw parse_error("Variadic ellipsis must be the last parameter", input.position());
+					scratch->error("Variadic ellipsis must be the last parameter", input.position());
 				scratch->wip_mem_fn_proto.args.push_back({scratch->wip_type, ""});
 			} else {
 				if (scratch->wip_fn_proto.is_variadic)
-					throw parse_error("Variadic ellipsis must be the last parameter", input.position());
+					scratch->error("Variadic ellipsis must be the last parameter", input.position());
 				scratch->wip_fn_proto.args.push_back({scratch->wip_type, ""});
 			}
 		}
@@ -119,11 +119,11 @@ namespace broma {
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			if (scratch->is_class) {
 				if (scratch->wip_mem_fn_proto.is_variadic)
-					throw parse_error("Variadic ellipsis can only appear once", input.position());
+					scratch->error("Variadic ellipsis can only appear once", input.position());
 				scratch->wip_mem_fn_proto.is_variadic = true;
 			} else {
 				if (scratch->wip_fn_proto.is_variadic)
-					throw parse_error("Variadic ellipsis can only appear once", input.position());
+					scratch->error("Variadic ellipsis can only appear once", input.position());
 				scratch->wip_fn_proto.is_variadic = true;
 			}
 		}

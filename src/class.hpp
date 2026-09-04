@@ -39,8 +39,7 @@ namespace broma {
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			// This happens after the inner expression is done parsing
 			scratch->wip_field.parent = scratch->wip_class.name;
-			static size_t index = 0;
-			scratch->wip_field.field_id = index++;
+			scratch->wip_field.field_id = scratch->next_field_id++;
 			scratch->wip_class.fields.push_back(scratch->wip_field);
 		}
 	};
@@ -83,8 +82,10 @@ namespace broma {
 	struct run_action<named_rule("superclass", qualified)> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
-			if (scratch->wip_class.name == input.string())
-				throw parse_error("Class subclasses itself", input.position());
+			if (scratch->wip_class.name == input.string()) {
+				scratch->error("class " + input.string() + " subclasses itself", input.position());
+				return;
+			}
 
 			scratch->wip_class.superclasses.push_back(input.string());
 			scratch->wip_class.attributes.depends.push_back(input.string());
@@ -99,8 +100,12 @@ namespace broma {
 			scratch->wip_class.source = scratch->canonicalizePath(input.input().source());
 			scratch->wip_class.line = input.position().line;
 
-			if (std::find(root->classes.begin(), root->classes.end(), input.string()) != root->classes.end()) {
-				scratch->errors.push_back(parse_error("Class duplicate! " + input.string(), input.position()));
+			auto dupe = std::find(root->classes.begin(), root->classes.end(), input.string());
+			if (dupe != root->classes.end()) {
+				scratch->error(
+					"duplicate class declaration for " + input.string() + " (previous declaration at " + dupe->source + ":" + std::to_string(dupe->line) + ")",
+					input.position()
+				);
 			}
 		}
 	};

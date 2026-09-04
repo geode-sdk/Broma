@@ -162,7 +162,10 @@ namespace broma {
 			for (auto& f : scratch->wip_class.fields) {
 				if (auto fn = f.get_fn()) {
 					if (*fn == scratch->wip_mem_fn_proto) {
-						scratch->errors.push_back(parse_error("Function duplicate!", input.position()));
+						scratch->error(
+							"duplicate class method declaration for " + scratch->wip_mem_fn_proto.name + " (previous declaration at " + scratch->wip_class.source + ":" + std::to_string(f.line) + ")",
+							input.position()
+						);
 					}
 				}
 			}

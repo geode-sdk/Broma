@@ -49,7 +49,8 @@ namespace broma {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			if (scratch->wip_platform_block.has_value()) {
-				throw parse_error("cannot use this inside a platform expression", input);
+				scratch->error("cannot use this inside a platform expression", input.position());
+				return;
 			}
 
 			scratch->wip_field.get_as<MemberField>()->platform = str_to_platform(input.string());
@@ -73,13 +74,13 @@ namespace broma {
 
 			for (auto& old_name : mf->attributes.renamed_from) {
 				if (old_name == mf->name)
-					throw parse_error("renamed_from attribute value cannot match the member's current name", input.position());
+					scratch->error("renamed_from attribute value cannot match the member's current name", input.position());
 			}
 
-			// fold missing into platform so it reflects which platforms the member actually exists
+			// fold missing into platform so it reflects which platforms the member actually exists on
 			mf->platform &= ~mf->attributes.missing;
 			if (mf->platform == Platform::None) {
-				throw parse_error(
+				scratch->error(
 					"member is marked missing on every platform it's declared for", input.position()
 				);
 			}
@@ -129,7 +130,8 @@ namespace broma {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			if (!scratch->wip_platform_block.has_value()) {
-				throw parse_error("must specify padding if not using platform expression", input);
+				scratch->error("must specify padding if not using platform expression", input.position());
+				return;
 			}
 
 			size_t out = std::stoul(input.string(), nullptr, 16);
