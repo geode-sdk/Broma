@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_set>
 #include <variant>
 #include <algorithm>
 
@@ -206,7 +207,7 @@ namespace broma {
 		std::vector<std::string> superclasses; ///< Parent classes that this class inherits from.
 		std::vector<Field> fields; ///< All the fields parsed in the class.
 		std::string source; ///< The source file where this class was defined.
-		size_t line = 0; ///< The line number where this class was defined.
+		size_t line = 0; ///< The line number where this class was defined at in the file.
 
 		inline bool operator==(Class const& c) const {
 			return name == c.name;
@@ -222,13 +223,15 @@ namespace broma {
 		PlatformNumber binds; ///< The offsets of free function, separated per platform.
 		std::string inner; ///< The (optional) inline body of the function as a raw string.
 		std::string source; ///< The source file where this function was defined.
-		size_t line = 0; ///< The line number where this function was defined.
+		size_t line = 0; ///< The line number where this function was defined at in the file.
 	};
 
 	/// @brief A header file to be imported.
 	struct Header {
-		std::string name;
-		Platform platform = Platform::All;
+		std::string name; ///< The name of the header file.
+		Platform platform = Platform::All; ///< The platforms this header is intended to be imported for.
+		std::string source; ///< The source file where this header file was imported.
+		size_t line = 0; ///< The line number where this header was imported at in the file.
 	};
 
 	/// @brief Broma's root grammar (the root AST).
@@ -248,6 +251,55 @@ namespace broma {
 				return nullptr;
 
 			return &*it;
+		}
+
+		/// @brief All fields across every class in this Root.
+		inline std::vector<Field*> allFields() {
+			std::vector<Field*> out;
+
+			for (auto& c : classes)
+				for (auto& f : c.fields)
+					out.push_back(&f);
+
+			return out;
+		}
+
+		/// @brief Look up a field by its field_id across every class in this Root.
+		/// Returns nullptr if no field with that id exists.
+		inline Field* getFieldById(size_t field_id) {
+			for (auto& cls : classes) {
+				auto it = std::find_if(cls.fields.begin(), cls.fields.end(), [field_id](Field& f) {
+					return f.field_id == field_id;
+				});
+
+				if (it != cls.fields.end())
+					return &*it;
+			}
+
+			return nullptr;
+		}
+
+		/// @brief Every distinct source file that contributed content to this Root.
+		inline std::unordered_set<std::string> sources() const {
+			std::unordered_set<std::string> out;
+
+			for (auto& c : classes)     out.insert(c.source);
+			for (auto& f : functions)   out.insert(f.source);
+			for (auto& h : headers)     out.insert(h.source);
+
+			return out;
+		}
+
+		/// @brief Build a new, fully self-contained Root containing only the
+		/// classes, functions, and headers that came from the given source.
+		inline Root filterBySource(std::string const& source) const {
+			Root out;
+
+			for (auto& c : classes)     if (c.source == source) out.classes.push_back(c);
+			for (auto& f : functions)   if (f.source == source) out.functions.push_back(f);
+			for (auto& h : headers)     if (h.source == source) out.headers.push_back(h);
+
+			return out;
 		}
 	};
 } // namespace broma
