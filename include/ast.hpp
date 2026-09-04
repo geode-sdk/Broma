@@ -161,7 +161,7 @@ namespace broma {
 		PlatformNumber amount; ///< The amount of padding, separated per platform.
 	};
 
-	/// @brief A function that is bound to an offset.
+	/// @brief A class function that is bound to an offset.
 	struct FunctionBindField {
 		MemberFunctionProto prototype;
 		PlatformNumber binds; ///< The offsets, separated per platform.
@@ -176,9 +176,10 @@ namespace broma {
 	/// @brief A class field.
 	struct Field {
 		size_t field_id; ///< The index of the field. This starts from 0 and counts up across all classes.
+						 ///< Stays persistent across several included Broma files with the include expression.
 		std::string parent; ///< The name of the parent class.
 		std::variant<InlineField, FunctionBindField, PadField, MemberField> inner;
-		size_t line = 0; ///< The line number where this class was defined.
+		size_t line = 0; ///< The line number where this field was defined at inside the class.
 
 		/// @brief Cast the field into a variant type. This is useful to extract data from the field.
 		template <typename T>
@@ -220,10 +221,10 @@ namespace broma {
 	/// @brief A top-level free function binding.
 	struct Function {
 		FunctionProto prototype; ///< The free function's signature.
-		PlatformNumber binds; ///< The offsets of free function, separated per platform.
+		PlatformNumber binds; ///< The offsets of this free function, separated per platform.
 		std::string inner; ///< The (optional) inline body of the function as a raw string.
-		std::string source; ///< The source file where this function was defined.
-		size_t line = 0; ///< The line number where this function was defined at in the file.
+		std::string source; ///< The source file where this free function was defined.
+		size_t line = 0; ///< The line number where this free function was defined at in the file.
 	};
 
 	/// @brief A header file to be imported.

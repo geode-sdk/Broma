@@ -30,15 +30,19 @@ namespace broma {
 			return geode::Err(ParseError{ { e.what() } });
 		}
 
-		post_process(root);
+		post_process(root, scratch);
 
-		if (!scratch.errors.empty()) {
+		if (!scratch.errors.empty() || !scratch.post_errors.empty()) {
 			std::vector<std::string> msgs;
 
 			std::cerr << "[Broma] errors found while parsing:\n";
 			for (auto& e : scratch.errors) {
 				std::cerr << "\t" << e.what() << "\n";
 				msgs.push_back(e.what());
+			}
+			for (auto& e : scratch.post_errors) {
+				std::cerr << "\t" << e << "\n";
+				msgs.push_back(e);
 			}
 
 			return geode::Err(ParseError{ std::move(msgs) });
