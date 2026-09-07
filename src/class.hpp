@@ -3,6 +3,7 @@
 #include <tao/pegtl.hpp>
 using namespace tao::pegtl;
 
+#include "comments.hpp"
 #include "basic_components.hpp"
 #include "function.hpp"
 #include "member.hpp"
@@ -31,7 +32,25 @@ namespace broma {
 		}
 	};
 
-	struct field : sor<inline_expr, pad_expr, member_expr, bind_expr> {};
+	struct comment_expr : comment_expr_base {};
+
+	template <>
+	struct run_action<comment_expr> {
+		template <typename T>
+		static void apply(T& input, Root* root, ScratchData* scratch) {
+			auto parsed = extract_comment(input);
+
+			CommentField cf;
+			cf.inner = std::move(parsed.text);
+			cf.multiline = parsed.multiline;
+			cf.trailing = parsed.trailing;
+
+			scratch->wip_field.inner = std::move(cf);
+			scratch->wip_field.line = input.position().line;
+		}
+	};
+
+	struct field : sor<inline_expr, pad_expr, member_expr, bind_expr, comment_expr> {};
 
 	template <>
 	struct run_action<field> {
