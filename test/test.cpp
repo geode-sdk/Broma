@@ -40,7 +40,7 @@ inline std::string nameForPlatform(broma::Platform platform) {
         case Platform::Android32: return "android32";
         case Platform::Android64: return "android64";
         default:
-            return "win";
+            return "mixed";
     }
 }
 
@@ -138,7 +138,11 @@ void print_ast(broma::Root& ast) {
     std::cout << "Classes: " << ast.classes.size() << "\n";
     for (auto cls : ast.classes) {
         std::cout << "links: " << (long)cls.attributes.links << "\n";
-        std::cout << "class " << cls.name << " {\n";
+        std::cout << "class " << cls.name;
+        for (auto super : cls.superclasses) {
+            std::cout << " : " << super.name << " " << (nameForPlatform(super.platform));
+        }
+        std::cout << " {\n";
         for (auto field : cls.fields) {
             if (auto func = field.get_as<broma::FunctionBindField>()) {
                 std::cout << "access modifier: " << nameForAccess(func->prototype.access) << "\n";

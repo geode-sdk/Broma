@@ -201,11 +201,16 @@ namespace broma {
 		}
 	};
 
+	struct Superclass {
+	    std::string name;
+		Platform platform = Platform::All;
+	};
+
 	/// @brief A top-level class declaration.
 	struct Class {
 		Attributes attributes;
 		std::string name; ///< The name of the class.
-		std::vector<std::string> superclasses; ///< Parent classes that this class inherits from.
+		std::vector<Superclass> superclasses; ///< Parent classes that this class inherits from.
 		std::vector<Field> fields; ///< All the fields parsed in the class.
 		std::string source; ///< The source file where this class was defined.
 		size_t line = 0; ///< The line number where this class was defined at in the file.

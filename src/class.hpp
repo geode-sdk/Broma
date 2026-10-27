@@ -55,6 +55,13 @@ namespace broma {
 		until<one<'}'>, sep, must<field>, sep>
 	> {};
 
+	struct superclass_statement :
+	seq<
+	    opt<tagged_platform<superclass_statement>>,
+		sep,
+		tagged_rule<superclass_statement, qualified>
+	> {};
+
 	/// @brief A class declaration.
 	struct class_statement :
 	seq<
@@ -69,7 +76,7 @@ namespace broma {
 			sep,
 			list<seq<
 				sep,
-				named_rule("superclass", qualified),
+				superclass_statement,
 				sep
 			>, one<','>>
 		>,
@@ -79,16 +86,33 @@ namespace broma {
 	> {};
 
 	template <>
-	struct run_action<named_rule("superclass", qualified)> {
-		template <typename T>
+	struct run_action<tagged_platform<superclass_statement>> {
+	    template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
-			if (scratch->wip_class.name == input.string()) {
+			scratch->wip_superclass.platform = str_to_platform(input.string());
+		}
+	};
+
+	template <>
+	struct run_action<tagged_rule<superclass_statement, qualified>> {
+	    template <typename T>
+		static void apply(T& input, Root* root, ScratchData* scratch) {
+		    if (scratch->wip_class.name == input.string()) {
 				scratch->error("class " + input.string() + " subclasses itself", input.position());
 				return;
 			}
 
-			scratch->wip_class.superclasses.push_back(input.string());
+			scratch->wip_superclass.name = input.string();
+		}
+	};
+
+	template <>
+	struct run_action<superclass_statement> {
+		template <typename T>
+		static void apply(T& input, Root* root, ScratchData* scratch) {
+			scratch->wip_class.superclasses.push_back(scratch->wip_superclass);
 			scratch->wip_class.attributes.depends.push_back(input.string());
+			scratch->wip_superclass = {};
 		}
 	};
 

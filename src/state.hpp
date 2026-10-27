@@ -33,6 +33,7 @@ namespace broma {
 		std::optional<Platform> wip_platform_block;
 		Platform wip_import_platform = Platform::All;
 		size_t next_field_id = 0;
+		Superclass wip_superclass;
 
 		std::vector<tao::pegtl::parse_error> errors;
 		std::vector<std::string> post_errors; // post_process errors

@@ -40,8 +40,12 @@ class Test {
     PAD = m1 0x53;
 }
 
+class Superclass {
+    int hi;
+}
+
 [[missing(mac)]]
-class Derive : Test {
+class Derive : win Test, Superclass {
     virtual ~Derive();
 
     [[missing(win)]]
