@@ -55,6 +55,13 @@ namespace broma {
 		>
 	>> {};
 
+	struct unhookable_attribute : basic_attribute<TAO_PEGTL_KEYWORD("unhookable"), tagged_rule<unhookable_attribute,
+		seq<
+			rule_begin<unhookable_attribute>,
+			opt<platform_list<unhookable_attribute>>
+		>
+	>> {};
+
 	struct since_attribute : basic_attribute<TAO_PEGTL_KEYWORD("since"), tagged_rule<since_attribute, string_literal>> {};
 
 	struct renamed_from_attribute : basic_attribute<TAO_PEGTL_KEYWORD("renamed_from"),
@@ -73,7 +80,7 @@ namespace broma {
 				list<
 					seq<
 						sep,
-						sor<depends_attribute, link_attribute, missing_attribute, since_attribute, renamed_from_attribute>,
+						sor<depends_attribute, link_attribute, missing_attribute, since_attribute, renamed_from_attribute, unhookable_attribute>,
 						sep
 					>,
 					one<','>
@@ -139,6 +146,24 @@ namespace broma {
 
 	template <>
 	struct run_action<tagged_platform<missing_attribute>> {
+		template <typename T>
+		static void apply(T& input, Root* root, ScratchData* scratch) {
+			scratch->wip_attributes.missing |= str_to_platform(input.string());
+		}
+	};
+
+	// missing
+
+	template <>
+	struct run_action<rule_begin<unhookable>> {
+		template <typename T>
+		static void apply(T& input, Root* root, ScratchData* scratch) {
+			// no reset
+		}
+	};
+
+	template <>
+	struct run_action<tagged_platform<unhookable>> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			scratch->wip_attributes.missing |= str_to_platform(input.string());
