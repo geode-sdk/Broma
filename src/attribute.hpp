@@ -155,7 +155,7 @@ namespace broma {
 	// missing
 
 	template <>
-	struct run_action<rule_begin<unhookable>> {
+	struct run_action<rule_begin<unhookable_attribute>> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			// no reset
@@ -163,7 +163,7 @@ namespace broma {
 	};
 
 	template <>
-	struct run_action<tagged_platform<unhookable>> {
+	struct run_action<tagged_platform<unhookable_attribute>> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
 			scratch->wip_attributes.missing |= str_to_platform(input.string());
