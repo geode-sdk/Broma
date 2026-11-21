@@ -152,7 +152,7 @@ namespace broma {
 		}
 	};
 
-	// missing
+	// unhookable
 
 	template <>
 	struct run_action<rule_begin<unhookable_attribute>> {
