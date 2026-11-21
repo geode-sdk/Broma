@@ -4,15 +4,8 @@
 using namespace tao::pegtl;
 
 namespace broma {
-	/// @brief C and C++-style comments.
-	struct comment :
-		disable<sor<
-			seq<at<ascii::string<'/', '/'>, not_at<one<'/'>>>, until<eolf>>,
-			seq<ascii::string<'/', '*'>, until<seq<ascii::string<'*', '/'>>>>
-		>> {};
-
 	/// @brief Noisy filler grammar elements we want to ignore when parsing.
-	struct ignore : sor<comment, one<'\n', '\t', '\r', ' '>> {};
+	struct ignore : sor<one<'\n', '\t', '\r', ' '>> {};
 
 	/// @brief Separator (zero or more ignoreable elements).
 	struct sep : star<ignore> {};
