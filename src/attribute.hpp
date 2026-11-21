@@ -166,7 +166,7 @@ namespace broma {
 	struct run_action<tagged_platform<unhookable_attribute>> {
 		template <typename T>
 		static void apply(T& input, Root* root, ScratchData* scratch) {
-			scratch->wip_attributes.missing |= str_to_platform(input.string());
+			scratch->wip_attributes.unhookable |= str_to_platform(input.string());
 		}
 	};
 
