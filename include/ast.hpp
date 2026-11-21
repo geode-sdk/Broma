@@ -84,6 +84,7 @@ namespace broma {
 		std::string docs; ///< Any docstring pulled from a `[[docs(...)]]` attribute.
 		Platform links = Platform::None; ///< All the platforms that link the class or function
 		Platform missing = Platform::None; ///< All the platforms that are missing the class or function
+		Platform unhookable = Platform::None; ///< All the platforms that the function is unhookable
 		std::vector<std::string> depends; ///< List of classes that this class or function depends on
 		std::string since; ///< The SDK version that this class or function was introduced in
 		std::vector<std::string> renamed_from; ///< Prior names for the attributed property.
